@@ -3,7 +3,76 @@ import React from 'react';
 const CreateOrderModal = ({ customer, isOpen, onClose, onCreateOrder, newOrder, setNewOrder, errors, calculateTotal, handleNewOrderChange }) => {
   if (!isOpen || !customer) return null;
 
-  const totalNum = calculateTotal() ? parseFloat(calculateTotal().replace(/,/g, '')) || 0 : 0;
+const totalNum = calculateTotal() ? parseFloat(calculateTotal().replace(/,/g, '')) || 0 : 0;
+
+  // Mock products data for UI
+  const products = [
+    { id: 1, name: 'T-Shirt', price: 1400 },
+    { id: 2, name: 'Hoodie', price: 2800 },
+    { id: 3, name: 'Jeans', price: 2725 },
+    { id: 4, name: 'Sneakers', price: 1750 },
+    { id: 5, name: 'Cap', price: 700 },
+    { id: 6, name: 'Dress', price: 2050 },
+    { id: 7, name: 'Skirt', price: 2040 },
+    { id: 8, name: 'Jacket', price: 4100 },
+    { id: 9, name: 'Shirt', price: 1050 },
+    { id: 10, name: 'Belt', price: 630 },
+    { id: 11, name: 'Wallet', price: 845 },
+    { id: 12, name: 'Backpack', price: 2800 },
+    { id: 13, name: 'Bag', price: 1150 },
+    { id: 14, name: 'Scarf', price: 668 },
+    { id: 15, name: 'Jewelry Set', price: 1500 }
+  ];
+
+  const [selectedProducts, setSelectedProducts] = React.useState([]);
+  const [filteredProducts, setFilteredProducts] = React.useState(products);
+  const [productSearch, setProductSearch] = React.useState('');
+
+  // Filter products
+  React.useEffect(() => {
+    const filtered = products.filter(p => 
+      p.name.toLowerCase().includes(productSearch.toLowerCase())
+    );
+    setFilteredProducts(filtered);
+  }, [productSearch]);
+
+  // Calculate total from selected
+  const calculateSelectedTotal = () => {
+    const total = selectedProducts.reduce((sum, sp) => {
+      const subtotal = sp.price * sp.qty * (1 - sp.discount / 100);
+      return sum + subtotal;
+    }, 0);
+    return total.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+  };
+
+  // Add product
+  const addProduct = (product) => {
+    if (selectedProducts.find(sp => sp.id === product.id)) return;
+    setSelectedProducts([...selectedProducts, { ...product, qty: 1, discount: 0 }]);
+  };
+
+  // Update qty
+  const updateQty = (id, delta) => {
+    setSelectedProducts(prev => prev.map(sp => 
+      sp.id === id ? { ...sp, qty: Math.max(1, sp.qty + delta) } : sp
+    ));
+  };
+
+  // Update discount
+  const updateDiscount = (id, discount) => {
+    setSelectedProducts(prev => prev.map(sp => 
+      sp.id === id ? { ...sp, discount: Math.max(0, Math.min(100, parseFloat(discount) || 0)) } : sp
+    ));
+  };
+
+  // Remove product
+  const removeProduct = (id) => {
+    setSelectedProducts(prev => prev.filter(sp => sp.id !== id));
+  };
+
+  // Items count
+  const itemsCount = selectedProducts.reduce((sum, sp) => sum + sp.qty, 0);
+  const avgPrice = itemsCount > 0 ? (parseFloat(calculateSelectedTotal().replace(/,/g, '')) / itemsCount).toFixed(0) : 0;
 
   return (
     <>
@@ -99,80 +168,173 @@ const CreateOrderModal = ({ customer, isOpen, onClose, onCreateOrder, newOrder, 
                 New Order Details
               </h4>
               <div className="space-y-4">
+              {/* Order Details Section */}
+              <div className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-slate-300 mb-2">Order Date</label>
                   <input
                     type="date"
                     name="date"
-                    value={newOrder.date}
+                    value={newOrder.date || ''}
                     onChange={handleNewOrderChange}
                     className="w-full bg-slate-800/50 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
                   />
-                  {errors.date && <p className="text-red-400 text-xs mt-1">{errors.date}</p>}
                 </div>
 
+                {/* Order ID with generate */}
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="col-span-2">
+                    <label className="block text-sm font-medium text-slate-300 mb-2">Order ID</label>
+                    <input
+                      type="text"
+                      name="orderId"
+                      placeholder="ORD-20241101-001"
+                      value={newOrder.orderId || ''}
+                      onChange={handleNewOrderChange}
+                      className="w-full bg-slate-800/50 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
+                    />
+                  </div>
+                  <button 
+                    onClick={() => {
+                      const id = `ORD-${new Date().toISOString().slice(0,10).replace(/-/g,'')}-${Math.floor(Math.random()*999).toString().padStart(3,'0')}`;
+                      handleNewOrderChange({target: {name: 'orderId', value: id}});
+                    }}
+                    className="mt-9 px-4 py-3 bg-emerald-600/80 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-all border border-emerald-400/30 shadow-lg hover:shadow-emerald-500/25"
+                  >
+                    Generate
+                  </button>
+                </div>
+
+                {/* Row selects */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">Payment Type</label>
+                    <select name="paymentType" value={newOrder.paymentType || ''} onChange={handleNewOrderChange} className="w-full bg-slate-800/50 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all">
+                      <option value="">Select Type</option>
+                      <option value="Cash">Cash</option>
+                      <option value="Card">Card</option>
+                      <option value="UPI">UPI</option>
+                      <option value="Bank Transfer">Bank Transfer</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">Payment Status</label>
+                    <select name="paymentStatus" value={newOrder.paymentStatus || ''} onChange={handleNewOrderChange} className="w-full bg-slate-800/50 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all">
+                      <option value="">Select Status</option>
+                      <option value="Pending">Pending</option>
+                      <option value="Paid">Paid</option>
+                      <option value="Failed">Failed</option>
+                      <option value="Refunded">Refunded</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">Order Status</label>
+                    <select name="orderStatus" value={newOrder.orderStatus || ''} onChange={handleNewOrderChange} className="w-full bg-slate-800/50 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all">
+                      <option value="">Select Status</option>
+                      <option value="Pending">Pending</option>
+                      <option value="Processing">Processing</option>
+                      <option value="Shipped">Shipped</option>
+                      <option value="Delivered">Delivered</option>
+                      <option value="Cancelled">Cancelled</option>
+                    </select>
+                  </div>
+                </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Items (e.g. T-Shirts)</label>
-                  <input
-                    type="text"
-                    name="items"
-                    placeholder="Product name"
-                    value={newOrder.items}
-                    onChange={handleNewOrderChange}
-                    className="w-full bg-slate-800/50 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
-                  />
-                  {errors.items && <p className="text-red-400 text-xs mt-1">{errors.items}</p>}
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Quantity</label>
-                    <input
-                      type="number"
-                      name="qty"
-                      placeholder="1"
-                      min="1"
-                      value={newOrder.qty}
-                      onChange={handleNewOrderChange}
-                      className="w-full bg-slate-800/50 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
-                    />
-                    {errors.qty && <p className="text-red-400 text-xs mt-1">{errors.qty}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Unit Price (₹)</label>
-                    <input
-                      type="number"
-                      name="unitPrice"
-                      placeholder="1000"
-                      min="0"
-                      step="0.01"
-                      value={newOrder.unitPrice}
-                      onChange={handleNewOrderChange}
-                      className="w-full bg-slate-800/50 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
-                    />
-                    {errors.unitPrice && <p className="text-red-400 text-xs mt-1">{errors.unitPrice}</p>}
-                  </div>
-                </div>
-
-                <div className="p-4 bg-emerald-500/10 border border-emerald-400/30 rounded-xl">
-                  <p className="text-sm text-slate-300">Order Total: ₹{calculateTotal()}</p>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">Source</label>
+                  <select name="source" value={newOrder.source || ''} onChange={handleNewOrderChange} className="w-full bg-slate-800/50 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all">
+                    <option value="">Select Source</option>
+                    <option value="Instagram">Instagram</option>
+                    <option value="Website">Website</option>
+                    <option value="Phone">Phone</option>
+                    <option value="Walk-in">Walk-in</option>
+                  </select>
                 </div>
               </div>
+
+              {/* Products Selector */}
+              <div className="space-y-4">
+                <label className="block text-sm font-medium text-slate-300 mb-2">Select Products</label>
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  value={productSearch}
+                  onChange={(e) => setProductSearch(e.target.value)}
+                  className="w-full bg-slate-800/50 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all mb-4"
+                />
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-48 overflow-y-auto">
+                  {filteredProducts.map((product) => (
+                    <button
+                      key={product.id}
+                      onClick={() => addProduct(product)}
+                      className={`p-3 rounded-xl border-2 transition-all text-sm font-medium flex flex-col items-center gap-1 ${
+                        selectedProducts.find(sp => sp.id === product.id)
+                          ? 'bg-emerald-500/20 border-emerald-400 text-emerald-200'
+                          : 'bg-slate-800/50 border-white/20 hover:bg-slate-700/50 hover:border-white/40 text-slate-200'
+                      }`}
+                    >
+                      <div className="font-bold text-base">₹{product.price.toLocaleString()}</div>
+                      <div className="text-xs opacity-90">{product.name}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Selected Products Table */}
+              {selectedProducts.length > 0 && (
+                <div className="space-y-3">
+                  <label className="block text-sm font-medium text-slate-300">Selected Products ({selectedProducts.length})</label>
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {selectedProducts.map((sp) => {
+                      const subtotal = sp.price * sp.qty * (1 - sp.discount / 100);
+                      return (
+                        <div key={sp.id} className="bg-slate-800/50 backdrop-blur-sm border border-white/10 rounded-xl p-4 grid grid-cols-1 md:grid-cols-5 items-center gap-4">
+                          <div className="font-semibold text-white md:col-span-2">{sp.name}</div>
+                          <div className="text-slate-300">₹{sp.price.toLocaleString()}</div>
+                          <div className="flex items-center gap-2">
+                            <button onClick={() => updateQty(sp.id, -1)} className="w-10 h-10 bg-slate-700/50 hover:bg-slate-600 rounded-lg flex items-center justify-center text-white font-bold transition-all">-</button>
+                            <span className="font-bold text-white min-w-[2rem] text-center">{sp.qty}</span>
+                            <button onClick={() => updateQty(sp.id, 1)} className="w-10 h-10 bg-emerald-600/80 hover:bg-emerald-500 rounded-lg flex items-center justify-center text-white font-bold transition-all">+</button>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="number"
+                              min="0"
+                              max="100"
+                              step="0.1"
+                              value={sp.discount}
+                              onChange={(e) => updateDiscount(sp.id, e.target.value)}
+                              className="w-20 bg-slate-700/50 border border-white/20 rounded-lg px-2 py-1 text-white text-sm focus:outline-none focus:ring-1 focus:ring-emerald-400"
+                              placeholder="0"
+                            />
+                            <span className="text-slate-400 text-xs">%</span>
+                          </div>
+                          <div className="text-right font-bold text-emerald-400">₹{subtotal.toLocaleString('en-IN', {maximumFractionDigits: 0})}</div>
+                          <button onClick={() => removeProduct(sp.id)} className="ml-auto text-red-400 hover:text-red-300 font-semibold text-sm md:col-span-1">Remove</button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="p-4 bg-emerald-500/10 border border-emerald-400/30 rounded-xl">
+                    <p className="text-sm text-slate-300">Order Total: ₹{calculateSelectedTotal()}</p>
+                  </div>
+                </div>
+              )}
+            </div>
             </div>
 
             {/* Stats */}
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 pt-4 border-t border-white/10">
               <div className="p-4 bg-slate-800/30 backdrop-blur-sm rounded-xl border border-white/10 text-center">
                 <p className="text-slate-400 text-xs uppercase tracking-wide">Order Total</p>
-                <p className="text-2xl font-bold text-white">₹{totalNum.toLocaleString()}</p>
+                <p className="text-2xl font-bold text-white">₹{calculateSelectedTotal()}</p>
               </div>
               <div className="p-4 bg-slate-800/30 backdrop-blur-sm rounded-xl border border-white/10 text-center">
-                <p className="text-slate-400 text-xs uppercase tracking-wide">Items</p>
-                <p className="text-2xl font-bold text-emerald-400">1</p>
+                <p className="text-slate-400 text-xs uppercase tracking-wide">Total Items</p>
+                <p className="text-2xl font-bold text-emerald-400">{itemsCount}</p>
               </div>
               <div className="p-4 bg-slate-800/30 backdrop-blur-sm rounded-xl border border-white/10 text-center">
-                <p className="text-slate-400 text-xs uppercase tracking-wide">Unit Price</p>
-                <p className="text-2xl font-bold text-blue-400">₹{(totalNum || 0).toLocaleString()}</p>
+                <p className="text-slate-400 text-xs uppercase tracking-wide">Avg Price</p>
+                <p className="text-2xl font-bold text-blue-400">₹{avgPrice.toLocaleString()}</p>
               </div>
             </div>
           </div>
@@ -190,9 +352,19 @@ const CreateOrderModal = ({ customer, isOpen, onClose, onCreateOrder, newOrder, 
                 Cancel
               </button>
               <button 
-                onClick={onCreateOrder}
+                onClick={() => {
+                  // Update newOrder with selected data before create
+                  setNewOrder(prev => ({
+                    ...prev,
+                    items: JSON.stringify(selectedProducts.map(sp => `${sp.name} x ${sp.qty} @ ₹${sp.price} (-${sp.discount}%)`)),
+                    qty: selectedProducts.reduce((sum, sp) => sum + sp.qty, 0),
+                    unitPrice: selectedProducts.length > 0 ? selectedProducts[0].price : '',
+                    products: selectedProducts // new field
+                  }));
+                  onCreateOrder();
+                }}
                 className="flex-1 px-6 py-4 bg-emerald-600/80 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-all border border-emerald-400/30 flex items-center justify-center gap-2 shadow-lg hover:shadow-emerald-500/25"
-                disabled={!newOrder.date || !newOrder.items || !newOrder.qty || !newOrder.unitPrice}
+                disabled={!newOrder.date || selectedProducts.length === 0}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
