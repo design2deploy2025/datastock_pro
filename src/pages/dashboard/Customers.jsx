@@ -277,54 +277,50 @@ const Customers = () => {
 
 
                 <div className="flex-1 overflow-y-auto p-6 lg:p-8 space-y-8">
-                  {/* Contact Details Row */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* 4 Contact Blocks in Single Row */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {/* Instagram */}
-                    <div className="group p-6 bg-slate-800/50 hover:bg-slate-700/50 rounded-2xl border border-white/10 transition-all cursor-pointer" onClick={async () => {
+                    <div className="group p-4 bg-slate-800/50 hover:bg-slate-700/50 rounded-xl border border-white/10 transition-all cursor-pointer" onClick={async () => {
                       await navigator.clipboard.writeText(selectedCustomer.instagram);
                     }}>
-                      <div className="flex items-center gap-3 mb-3">
-                        <svg className="w-6 h-6 text-pink-400 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                      <div className="flex items-center gap-2 mb-2">
+                        <svg className="w-5 h-5 text-pink-400 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.921.146-6.462 2.556-6.61 6.611-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.148 4.955 2.683 6.611 6.61 6.61 1.28.059 1.688.073 4.948.073 3.259 0 3.668-.014 4.948-.072 4.924-.146 6.464-2.541 6.61-6.61.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.146-4.92-2.556-6.61-6.611-6.61-1.28-.059-1.689-.073-4.948-.073z"/>
                           <path d="M12 5.839c-2.847 0-5.158 2.311-5.158 5.158s2.311 5.158 5.158 5.158 5.158-2.311 5.158-5.158-2.311-5.158-5.158-5.158z"/>
                           <path d="M15.663 11.998h-1.68v-1.679h2.928v1.679h-1.248v3.553h-1.001V11.998z"/>
                         </svg>
-                        <span className="font-semibold text-slate-200 group-hover:text-pink-400 transition-colors">Instagram</span>
+                        <span className="font-semibold text-slate-200 group-hover:text-pink-400 transition-colors text-sm">Instagram</span>
                       </div>
-                      <p className="text-slate-300 font-mono text-base break-all">{selectedCustomer.instagram}</p>
-                      <p className="text-emerald-400 text-sm font-medium mt-2 opacity-0 group-hover:opacity-100 transition-all">Copied!</p>
+                      <p className="text-slate-300 font-mono text-sm break-all">{selectedCustomer.instagram}</p>
                     </div>
                     {/* Phone */}
-                    <div className="group p-6 bg-slate-800/50 hover:bg-slate-700/50 rounded-2xl border border-white/10 transition-all cursor-pointer" onClick={async () => {
+                    <div className="group p-4 bg-slate-800/50 hover:bg-slate-700/50 rounded-xl border border-white/10 transition-all cursor-pointer" onClick={async () => {
                       await navigator.clipboard.writeText(selectedCustomer.phone);
                     }}>
-                      <div className="flex items-center gap-3 mb-3">
-                        <svg className="w-6 h-6 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="flex items-center gap-2 mb-2">
+                        <svg className="w-5 h-5 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                         </svg>
-                        <span className="font-semibold text-slate-200 group-hover:text-emerald-400 transition-colors">Phone</span>
+                        <span className="font-semibold text-slate-200 group-hover:text-emerald-400 transition-colors text-sm">Phone</span>
                       </div>
-                      <p className="text-slate-300 font-mono text-base">{selectedCustomer.phone}</p>
-                      <p className="text-emerald-400 text-sm font-medium mt-2 opacity-0 group-hover:opacity-100 transition-all">Copied!</p>
+                      <p className="text-slate-300 font-mono text-sm">{selectedCustomer.phone}</p>
                     </div>
-                  </div>
-
-                  {/* Address & LTV Row */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div className="lg:col-span-1 p-6 bg-slate-800/30 rounded-2xl border border-white/10">
-                      <div className="flex items-center gap-3 mb-3">
-                        <svg className="w-6 h-6 text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {/* Address */}
+                    <div className="p-4 bg-slate-800/30 rounded-xl border border-white/10">
+                      <div className="flex items-center gap-2 mb-2">
+                        <svg className="w-5 h-5 text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
-                        <span className="font-semibold text-slate-200">Address</span>
+                        <span className="font-semibold text-slate-200 text-sm">Address</span>
                       </div>
-                      <p className="text-slate-300 text-base leading-relaxed">{selectedCustomer.address}</p>
+                      <p className="text-slate-300 text-sm leading-relaxed">{selectedCustomer.address}</p>
                     </div>
-                    <div className="lg:col-span-1 p-8 bg-gradient-to-br from-emerald-500/10 to-emerald-600/20 border border-emerald-400/30 rounded-2xl text-center">
-                      <p className="text-emerald-300 text-sm uppercase tracking-wide font-medium">Lifetime Value</p>
-                      <p className="text-3xl font-bold text-white mt-1">{selectedCustomer.totalOrdersValue}</p>
-                      <p className="text-emerald-300 text-sm mt-1">{orderCount} orders</p>
+                    {/* LTV */}
+                    <div className="p-4 bg-gradient-to-br from-emerald-500/10 to-emerald-600/20 border border-emerald-400/30 rounded-xl text-center">
+                      <p className="text-emerald-300 text-xs uppercase tracking-wide font-medium">Lifetime Value</p>
+                      <p className="text-xl font-bold text-white mt-1">{selectedCustomer.totalOrdersValue}</p>
+                      <p className="text-emerald-300 text-xs mt-1">{orderCount} orders</p>
                     </div>
                   </div>
 
@@ -336,19 +332,33 @@ const Customers = () => {
                       </svg>
                       Recent Orders ({orderCount})
                     </h4>
-                    <div className="space-y-3 max-h-48 overflow-y-auto">
-                      {selectedCustomer.orders.slice(0, 5).map((order, index) => (
-                        <div key={index} className="flex items-center gap-4 p-4 bg-slate-800/30 hover:bg-slate-700/50 rounded-xl border border-white/10 transition-all group">
-                          <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-slate-600 to-slate-500 rounded-xl flex items-center justify-center font-mono text-sm text-white font-semibold">
-                            {new Date(order.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                    <div className="space-y-3">
+                      {selectedCustomer.orders.slice(0, 5).map((order, index) => {
+                        // Parse items like "T-Shirts x 3" -> product, qty
+                        const itemsMatch = order.items.match(/(.+?)\s*x\s*(\d+)/);
+                        const product = itemsMatch ? itemsMatch[1].trim() : order.items;
+                        const qty = itemsMatch ? parseInt(itemsMatch[2]) : 1;
+                        const totalPrice = parseFloat(order.value.replace(/[^0-9.]/g, ''));
+                        const unitPrice = qty > 0 ? (totalPrice / qty).toFixed(0) : 0;
+                        
+                        return (
+                          <div key={index} className="p-4 bg-slate-800/30 hover:bg-slate-700/50 rounded-xl border border-white/10 transition-all group">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-2">
+                              <div className="text-slate-300 font-mono text-xs font-semibold">
+                                {new Date(order.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 flex-1 text-sm">
+                                <div className="font-semibold text-white truncate">{product}</div>
+                                <div className="text-slate-400">Qty: {qty}</div>
+                                <div className="text-slate-400">Unit: ₹{unitPrice}</div>
+                              </div>
+                              <div className="text-right font-bold text-emerald-400 text-base whitespace-nowrap">
+                                ₹{order.value}
+                              </div>
+                            </div>
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-white truncate pr-4">{order.items}</p>
-                            <p className="text-slate-400 text-sm">₹{order.value}</p>
-                          </div>
-                          <span className="text-emerald-400 font-bold text-lg whitespace-nowrap">{order.value}</span>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -372,20 +382,6 @@ const Customers = () => {
                 {/* Footer Actions */}
                 <div className="p-6 border-t border-white/10 bg-slate-900/95 backdrop-blur-sm sticky bottom-0">
                   <div className="flex flex-col sm:flex-row gap-3">
-                    <a href={`tel:${selectedCustomer.phone}`} className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-4 px-6 rounded-xl text-center transition-all shadow-lg hover:shadow-emerald-500/25 flex items-center justify-center gap-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                      </svg>
-                      Call Customer
-                    </a>
-                    <a href={`https://instagram.com/${selectedCustomer.instagram.slice(1)}`} target="_blank" rel="noopener noreferrer" className="flex-1 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-semibold py-4 px-6 rounded-xl text-center transition-all shadow-lg hover:shadow-pink-500/25 flex items-center justify-center gap-2">
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.921.146-6.462 2.556-6.61 6.611-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.148 4.955 2.683 6.611 6.61 6.61 1.28.059 1.688.073 4.948.073 3.259 0 3.668-.014 4.948-.072 4.924-.146 6.464-2.541 6.61-6.61.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.146-4.92-2.556-6.61-6.611-6.61-1.28-.059-1.689-.073-4.948-.073z"/>
-                        <path d="M12 5.839c-2.847 0-5.158 2.311-5.158 5.158s2.311 5.158 5.158 5.158 5.158-2.311 5.158-5.158-2.311-5.158-5.158-5.158z"/>
-                        <path d="M15.663 11.998h-1.68v-1.679h2.928v1.679h-1.248v3.553h-1.001V11.998z"/>
-                      </svg>
-                      Message on IG
-                    </a>
                     <button className="px-6 py-4 bg-slate-700/50 hover:bg-slate-600 text-slate-200 font-semibold rounded-xl transition-all border border-white/20 flex items-center justify-center gap-2">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
