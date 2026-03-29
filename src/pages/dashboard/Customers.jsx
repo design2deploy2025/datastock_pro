@@ -2,6 +2,7 @@ import React from 'react';
 import Sidebar from '../../components/sidebar/Sidebar';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import CreateOrderModal from '../../components/dashboard/CreateOrderModal';
 
 const customers = [
 { 
@@ -107,14 +108,18 @@ const customers = [
 const Customers = () => {
   const [searchTerm, setSearchTerm] = React.useState('');
   const [sortBy, setSortBy] = React.useState('name');
-  const [sortOrder, setSortOrder] = React.useState('asc');
+const [sortOrder, setSortOrder] = React.useState('asc');
   const [selectedCustomer, setSelectedCustomer] = React.useState(null);
+  const [showCreateOrderModal, setShowCreateOrderModal] = React.useState(false);
 
   const { user, profile, logout } = useAuth();
   const navigate = useNavigate();
 
+  // Make customers mutable with useState
+  const [customersList, setCustomersList] = React.useState(customers);
+
   const filteredCustomers = React.useMemo(() => {
-    let result = customers.filter(customer =>
+    let result = customersList.filter(customer =>
       customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.instagram.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.phone.includes(searchTerm) ||
@@ -143,7 +148,73 @@ const Customers = () => {
     });
 
     return result;
-  }, [searchTerm, sortBy, sortOrder]);
+  }, [searchTerm, sortBy, sortOrder, customersList]);
+
+  const [newOrder, setNewOrder] = React.useState({ date: '', items: '', qty: '', unitPrice: '' });
+  const [errors, setErrors] = React.useState({});
+
+  const handleNewOrderChange = (e) => {
+    const { name, value } = e.target;
+    setNewOrder(prev => ({ ...prev, [name]: value }));
+    // Clear error on change
+    if (errors[name]) {
+      setErrors({});
+    }
+  };
+
+  const calculateTotal = () => {
+    const qty = parseFloat(newOrder.qty) || 0;
+    const price = parseFloat(newOrder.unitPrice) || 0;
+    const total = qty * price;
+    return total.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!newOrder.date) newErrors.date = 'Date is required';
+    if (!newOrder.items) newErrors.items = 'Items description is required';
+    if (!newOrder.qty || parseFloat(newOrder.qty) <= 0) newErrors.qty = 'Quantity must be > 0';
+    if (!newOrder.unitPrice || parseFloat(newOrder.unitPrice) <= 0) newErrors.unitPrice = 'Unit price must be > 0';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleCreateOrder = () => {
+    if (!validateForm()) return;
+
+    const qty = parseFloat(newOrder.qty);
+    const unitPrice = parseFloat(newOrder.unitPrice);
+    const total = qty * unitPrice;
+    const totalStr = `₹${total.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+    const itemsStr = `${newOrder.items} x ${qty}`;
+
+    const newOrderObj = {
+      date: newOrder.date,
+      items: itemsStr,
+      value: totalStr
+    };
+
+    // Update customersList
+    setCustomersList(prev => prev.map(customer => 
+      customer.id === selectedCustomer.id 
+        ? {
+            ...customer,
+            orders: [...customer.orders, newOrderObj],
+            totalOrdersValue: `₹${(parseFloat(customer.totalOrdersValue.replace(/[^0-9]/g, '')) + total).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`
+          }
+        : customer
+    ));
+
+    // Reset form and close modal
+    setNewOrder({ date: '', items: '', qty: '', unitPrice: '' });
+    setShowCreateOrderModal(false);
+  };
+
+  const closeCreateModal = () => {
+    setShowCreateOrderModal(false);
+    setNewOrder({ date: '', items: '', qty: '', unitPrice: '' });
+    setErrors({});
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -382,16 +453,36 @@ const Customers = () => {
                 {/* Footer Actions */}
                 <div className="p-6 border-t border-white/10 bg-slate-900/95 backdrop-blur-sm sticky bottom-0">
                   <div className="flex flex-col sm:flex-row gap-3">
-                    <button className="px-6 py-4 bg-slate-700/50 hover:bg-slate-600 text-slate-200 font-semibold rounded-xl transition-all border border-white/20 flex items-center justify-center gap-2">
+                    <button className="flex-1 px-6 py-4 bg-slate-700/50 hover:bg-slate-600 text-slate-200 font-semibold rounded-xl transition-all border border-white/20 flex items-center justify-center gap-2">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                       </svg>
                       Edit Details
                     </button>
+                    <button 
+                      onClick={() => setShowCreateOrderModal(true)}
+                      className="flex-1 px-6 py-4 bg-emerald-600/80 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-all border border-emerald-400/30 flex items-center justify-center gap-2 shadow-lg hover:shadow-emerald-500/25"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                      Create Order
+                    </button>
                   </div>
                 </div>
             </div>
           </div>
+          <CreateOrderModal
+            customer={selectedCustomer}
+            isOpen={showCreateOrderModal}
+            onClose={closeCreateModal}
+            onCreateOrder={handleCreateOrder}
+            newOrder={newOrder}
+            setNewOrder={setNewOrder}
+            errors={errors}
+            calculateTotal={calculateTotal}
+            handleNewOrderChange={handleNewOrderChange}
+          />
         </>
       )}
     </div>
