@@ -3,6 +3,7 @@ import Sidebar from '../../components/sidebar/Sidebar';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import CreateOrderModal from '../../components/dashboard/CreateOrderModal';
+import CustomersTable from '../../components/dashboard/CustomersTable';
 
 const customers = [
 { 
@@ -106,9 +107,6 @@ const customers = [
 ];
 
 const Customers = () => {
-  const [searchTerm, setSearchTerm] = React.useState('');
-  const [sortBy, setSortBy] = React.useState('name');
-const [sortOrder, setSortOrder] = React.useState('asc');
   const [selectedCustomer, setSelectedCustomer] = React.useState(null);
   const [showCreateOrderModal, setShowCreateOrderModal] = React.useState(false);
   const [isEditing, setIsEditing] = React.useState(false);
@@ -120,37 +118,7 @@ const [sortOrder, setSortOrder] = React.useState('asc');
   // Make customers mutable with useState
   const [customersList, setCustomersList] = React.useState(customers);
 
-  const filteredCustomers = React.useMemo(() => {
-    let result = customersList.filter(customer =>
-      customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.instagram.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.phone.includes(searchTerm) ||
-      customer.totalOrdersValue.includes(searchTerm)
-    );
 
-    result.sort((a, b) => {
-      let aVal, bVal;
-      if (sortBy === 'name') {
-        aVal = a.name;
-        bVal = b.name;
-      } else if (sortBy === 'instagram') {
-        aVal = a.instagram;
-        bVal = b.instagram;
-      } else if (sortBy === 'phone') {
-        aVal = a.phone;
-        bVal = b.phone;
-      } else if (sortBy === 'total') {
-        aVal = parseFloat(a.totalOrdersValue.replace(/[^0-9]/g, ''));
-        bVal = parseFloat(b.totalOrdersValue.replace(/[^0-9]/g, ''));
-      }
-      if (sortOrder === 'desc') {
-        return aVal > bVal ? -1 : 1;
-      }
-      return aVal > bVal ? 1 : -1;
-    });
-
-    return result;
-  }, [searchTerm, sortBy, sortOrder, customersList]);
 
   const [newOrder, setNewOrder] = React.useState({ date: '', items: '', qty: '', unitPrice: '' });
   const [errors, setErrors] = React.useState({});
@@ -290,69 +258,7 @@ const [sortOrder, setSortOrder] = React.useState('asc');
             <p className="text-slate-400">Manage and view your customer list.</p>
           </div>
 
-          <div className="bg-slate-900/30 backdrop-blur-sm rounded-2xl border border-white/20 p-6 mb-4">
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-              <div className="flex flex-wrap gap-3">
-                <input
-                  type="text"
-                  placeholder="Search name, instagram, phone or value..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="flex-1 min-w-64 bg-slate-800/50 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
-                />
-                <select 
-                  value={sortBy}
-                  onChange={(e) => {
-                    if (sortBy === e.target.value) {
-                      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-                    } else {
-                      setSortBy(e.target.value);
-                      setSortOrder('asc');
-                    }
-                  }}
-                  className="bg-slate-800/50 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
-                >
-                  <option value="name">Sort Name</option>
-                  <option value="instagram">Sort Instagram</option>
-                  <option value="phone">Sort Phone</option>
-                  <option value="total">Sort Value</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-slate-900/30 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-slate-800/70 border-b border-white/10">
-                  <tr>
-                    <th className="px-3 py-4 text-left text-slate-300 font-semibold text-base tracking-wide w-1/3">Name</th>
-                    <th className="px-3 py-4 text-left text-slate-300 font-semibold text-base tracking-wide w-1/4">Instagram</th>
-                    <th className="px-3 py-4 text-left text-slate-300 font-semibold text-base tracking-wide w-1/4">Phone</th>
-                    <th className="px-3 py-4 text-right text-slate-300 font-semibold text-base tracking-wide w-1/4">Total Order Value</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/5">
-                  {filteredCustomers.map((customer) => (
-                    <tr 
-                      key={customer.id} 
-                      className="hover:bg-slate-800/50 transition-colors cursor-pointer border-b border-white/5 last:border-b-0"
-                      onClick={() => setSelectedCustomer(customer)}
-                    >
-                      <td className="px-3 py-4 font-medium text-white">{customer.name}</td>
-                      <td className="px-3 py-4">
-                        <span className="inline-flex items-center px-2 py-1 bg-slate-700/50 text-slate-200 text-xs font-medium rounded-lg backdrop-blur-sm border border-white/10">
-                          {customer.instagram}
-                        </span>
-                      </td>
-                      <td className="px-3 py-4 text-slate-200 text-xs font-mono">{customer.phone}</td>
-                      <td className="px-3 py-4 text-right font-semibold text-emerald-400 text-sm">{customer.totalOrdersValue}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <CustomersTable data={customersList} onRowClick={setSelectedCustomer} />
         </div>
       </main>
 
