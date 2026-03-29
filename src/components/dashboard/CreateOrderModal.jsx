@@ -81,7 +81,7 @@ const totalNum = calculateTotal() ? parseFloat(calculateTotal().replace(/,/g, ''
         onClick={onClose}
       />
       <div className="fixed inset-0 flex items-center justify-center z-50 p-4 md:p-8 animate-in slide-in-from-bottom-4 duration-300 fade-in-0">
-        <div className="bg-slate-900/95 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl w-full max-w-6xl h-[85vh] max-h-[95vh] flex flex-col overflow-hidden">
+  <div className="bg-slate-900/95 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl w-full max-w-6xl h-[85vh] max-h-[95vh] flex flex-col">
           {/* Header */}
           <div className="p-6 lg:p-8 pb-4 border-b border-white/10 sticky top-0 bg-slate-900/95 backdrop-blur-sm z-10 flex-shrink-0">
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 lg:gap-6">
@@ -111,7 +111,7 @@ const totalNum = calculateTotal() ? parseFloat(calculateTotal().replace(/,/g, ''
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6 lg:p-8 space-y-8">
+          <div className="flex-1 p-6 lg:p-8 space-y-8 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-slate-900 hover:scrollbar-thumb-slate-500">
             {/* Contact Blocks */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Instagram */}
@@ -261,7 +261,7 @@ const totalNum = calculateTotal() ? parseFloat(calculateTotal().replace(/,/g, ''
                   onChange={(e) => setProductSearch(e.target.value)}
                   className="w-full bg-slate-800/50 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all mb-4"
                 />
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-48 overflow-y-auto">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-slate-900 hover:scrollbar-thumb-slate-500">
                   {filteredProducts.map((product) => (
                     <button
                       key={product.id}
@@ -283,7 +283,7 @@ const totalNum = calculateTotal() ? parseFloat(calculateTotal().replace(/,/g, ''
               {selectedProducts.length > 0 && (
                 <div className="space-y-3">
                   <label className="block text-sm font-medium text-slate-300">Selected Products ({selectedProducts.length})</label>
-                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                  <div className="space-y-3 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-slate-900 hover:scrollbar-thumb-slate-500">
                     {selectedProducts.map((sp) => {
                       const subtotal = sp.price * sp.qty * (1 - sp.discount / 100);
                       return (
