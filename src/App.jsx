@@ -1,10 +1,11 @@
 import React from 'react'
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Home from './pages/Home';
 import { Login } from './pages/Login';
 import { SignUp } from './pages/SignUp';
 import { useAuth } from './context/AuthContext'
 import TermsAndConditions from './pages/TermsAndConditions';
+import Dashboard from './pages/dashboard/Dashboard';
 
 
 
@@ -72,6 +73,7 @@ const App = () => {
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/signup" element={<PublicRoute><SignUp /></PublicRoute>} />
       <Route path="/terms" element={<PublicRoute><TermsAndConditions /></PublicRoute>} />
+      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
     </Routes>
   )
 }

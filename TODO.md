@@ -1,13 +1,17 @@
-# Logo Integration Complete
+# Task Progress: Create SQL for user signup/login
 
-## Completed:
-- [x] Created public/logo-black.svg (from black asset)
-- [x] Created public/logo-white.svg (from white asset)
-- [x] Updated Navbar.jsx: Logo now uses /logo-white.svg (suits dark navbar)
-- [x] Updated index.html: Favicon now /logo-white.svg
+## Plan Steps (Completed)
+- [x] Analyze project: Confirmed Supabase auth + profiles table usage.
+- [x] Create database/schema.sql with profiles table, RLS, policies, auto-create trigger.
+- [x] Track in TODO.md.
 
-## Optional:
-- Run `npm run dev` to preview at http://localhost:5173
-- Optionally delete old public/logo.svg and public/vite.svg if unused.
+## Followup Steps
+1. Open Supabase dashboard (https://supabase.com/dashboard/project/[your-project-ref]/sql).
+2. Copy-paste contents of `database/schema.sql` into New Query > Run.
+3. Test: Signup new user via /signup page → Check Table Editor > profiles for new row.
+4. Login via /login → Verify profile loads in dashboard.
+5. Optional: Update profile fields via upsert (add to app if needed).
+6. Verify RLS: Try accessing another user's profile (should fail).
 
-Task complete: Custom black/white SVGs integrated as logos.
+Task complete! SQL ready for deployment.
+

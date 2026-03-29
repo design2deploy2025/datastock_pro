@@ -1,7 +1,10 @@
 import React from 'react'
+import { useAuth } from '../../context/AuthContext';
+import { Link } from 'react-router-dom';
 import img from '../../assets/data-strategy-statistic-svgrepo-com (1).svg'
 
 const Navbar = () => {
+  const { user, logout } = useAuth();
   return (
     <div>
       <nav className="flex items-center justify-between p-4 border-b border-white/25 md:px-16 lg:px-24 xl:px-32 w-full bg-black bg-[url(https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/hero/bg-gradient-4.svg)] bg-center bg-cover">
@@ -62,7 +65,19 @@ const Navbar = () => {
           </button>
 
           <div className="max-md:hidden flex items-center gap-4">
-            <a href="/login" className="text-white hover:text-gray-300 transition font-medium">Login</a>
+{user ? (
+              <>
+                <Link to="/dashboard" className="text-white hover:text-gray-300 transition font-medium">Dashboard</Link>
+                <button 
+                  onClick={logout}
+                  className="text-white hover:text-gray-300 transition font-medium"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <a href="/login" className="text-white hover:text-gray-300 transition font-medium">Login</a>
+            )}
             {/* <a href="/signup" className="text-white px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 transition rounded-full font-medium">
               Get Started Free
             </a> */}
