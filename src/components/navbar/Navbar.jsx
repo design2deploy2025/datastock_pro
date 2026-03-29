@@ -1,13 +1,11 @@
 import React from 'react'
+import img from '../../assets/data-strategy-statistic-svgrepo-com (1).svg'
 
 const Navbar = () => {
   return (
     <div>
       <nav className="flex items-center justify-between p-4 border-b border-white/25 md:px-16 lg:px-24 xl:px-32 w-full bg-black bg-[url(https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/hero/bg-gradient-4.svg)] bg-center bg-cover">
-          <a href="/" className="flex items-center gap-2">
-            <img src="/logo.svg" alt="DataStock Pro" width="40" height="40" />
-            <span className="text-xl font-bold text-white">DataStock Pro</span>
-          </a>
+          <a href="/" className="flex items-center gap-2">\n            <img src={img} alt="DataStock Pro" width="40" height="40" />\n            <span className="text-xl font-bold text-white">DataStock Pro</span>\n          </a>
           <ul
             id="menu"
             className="max-md:absolute max-md:h-full max-md:w-full max-md:top-0 max-md:-left-full transition-all duration-300 max-md:backdrop-blur max-md:bg-black/80 max-md:text-white text-white flex flex-col md:flex-row items-center justify-center gap-8 font-medium"

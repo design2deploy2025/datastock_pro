@@ -1,9 +1,11 @@
+import img from '../../assets/data-strategy-statistic-svgrepo-com (1).svg'
+
 export default function Footer() {
     return (
         <footer className="w-full bg-black text-white bg-center bg-cover">
             <div className="max-w-7xl mx-auto px-6 py-16 flex flex-col items-center">
                 <div className="flex items-center space-x-3 mb-6">
-                    <img src="/logo.svg" alt="DataStock Pro" width="40" height="40" />
+                    <img src={img} alt="DataStock Pro" width="40" height="40" />
                     <span className="text-xl font-bold text-white">DataStock Pro</span>
                 </div>
                 <p className="text-center max-w-xl text-sm font-normal leading-relaxed text-slate-300">
