@@ -244,7 +244,7 @@ const Customers = () => {
             onClick={closeModal}
           />
           <div className="fixed inset-0 flex items-center justify-center z-50 p-4 md:p-8 animate-in slide-in-from-bottom-4 duration-300 fade-in-0">
-            <div className="bg-slate-900/95 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl w-full max-w-4xl h-[85vh] max-h-[95vh] flex flex-col overflow-hidden">
+            <div className="bg-slate-900/95 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl w-full max-w-6xl h-[85vh] max-h-[95vh] flex flex-col overflow-hidden">
               {/* Header */}
               <div className="p-6 lg:p-8 pb-4 border-b border-white/10 sticky top-0 bg-slate-900/95 backdrop-blur-sm z-10 flex-shrink-0">
                 <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 lg:gap-6">
