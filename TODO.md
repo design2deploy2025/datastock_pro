@@ -1,17 +1,12 @@
-# Task Progress: Create SQL for user signup/login
+# Color Scheme Update for Dashboard/Sidebar
 
-## Plan Steps (Completed)
-- [x] Analyze project: Confirmed Supabase auth + profiles table usage.
-- [x] Create database/schema.sql with profiles table, RLS, policies, auto-create trigger.
-- [x] Track in TODO.md.
+## Plan Overview
+Update dashboard and sidebar to professional solid black color scheme matching home page (no gradients/SVG overlays).
 
-## Followup Steps
-1. Open Supabase dashboard (https://supabase.com/dashboard/project/[your-project-ref]/sql).
-2. Copy-paste contents of `database/schema.sql` into New Query > Run.
-3. Test: Signup new user via /signup page → Check Table Editor > profiles for new row.
-4. Login via /login → Verify profile loads in dashboard.
-5. Optional: Update profile fields via upsert (add to app if needed).
-6. Verify RLS: Try accessing another user's profile (should fail).
+## Steps
+- [x] Step 1: Edit src/pages/dashboard/Dashboard.jsx (remove SVG bg, fix gradient text)
+- [x] Step 2: Edit src/components/sidebar/Sidebar.jsx (remove SVG bg)
+- [x] Step 3: Test changes (run dev server, check /dashboard visually)
+- [x] Step 4: Mark complete
 
-Task complete! SQL ready for deployment.
-
+**Complete!** Dashboard and sidebar now use professional solid black color scheme matching home page (bg-black, text-white/slate-300, no SVG gradients).
