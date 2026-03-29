@@ -182,8 +182,8 @@ const totalNum = calculateTotal() ? parseFloat(calculateTotal().replace(/,/g, ''
                 </div>
 
                 {/* Order ID with generate */}
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="col-span-2">
+                <div className="flex items-end gap-4">
+                  <div className="flex-1">
                     <label className="block text-sm font-medium text-slate-300 mb-2">Order ID</label>
                     <input
                       type="text"
@@ -199,7 +199,7 @@ const totalNum = calculateTotal() ? parseFloat(calculateTotal().replace(/,/g, ''
                       const id = `ORD-${new Date().toISOString().slice(0,10).replace(/-/g,'')}-${Math.floor(Math.random()*999).toString().padStart(3,'0')}`;
                       handleNewOrderChange({target: {name: 'orderId', value: id}});
                     }}
-                    className="mt-9 px-4 py-3 bg-emerald-600/80 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-all border border-emerald-400/30 shadow-lg hover:shadow-emerald-500/25"
+                    className="px-6 py-3 bg-emerald-600/80 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-all border border-emerald-400/30 shadow-lg hover:shadow-emerald-500/25 whitespace-nowrap"
                   >
                     Generate
                   </button>
@@ -295,18 +295,21 @@ const totalNum = calculateTotal() ? parseFloat(calculateTotal().replace(/,/g, ''
                             <span className="font-bold text-white min-w-[2rem] text-center">{sp.qty}</span>
                             <button onClick={() => updateQty(sp.id, 1)} className="w-10 h-10 bg-emerald-600/80 hover:bg-emerald-500 rounded-lg flex items-center justify-center text-white font-bold transition-all">+</button>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="number"
-                              min="0"
-                              max="100"
-                              step="0.1"
-                              value={sp.discount}
-                              onChange={(e) => updateDiscount(sp.id, e.target.value)}
-                              className="w-20 bg-slate-700/50 border border-white/20 rounded-lg px-2 py-1 text-white text-sm focus:outline-none focus:ring-1 focus:ring-emerald-400"
-                              placeholder="0"
-                            />
-                            <span className="text-slate-400 text-xs">%</span>
+                          <div className="flex flex-col items-center gap-1 min-w-[80px]">
+                            <span className="text-xs text-slate-400 font-medium tracking-wide">Discount</span>
+                            <div className="flex items-center gap-1">
+                              <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                step="0.1"
+                                value={sp.discount}
+                                onChange={(e) => updateDiscount(sp.id, e.target.value)}
+                                className="w-16 bg-slate-700/50 border border-white/20 rounded-lg px-2 py-1 text-white text-sm focus:outline-none focus:ring-1 focus:ring-emerald-400"
+                                placeholder="0"
+                              />
+                              <span className="text-slate-400 text-xs">%</span>
+                            </div>
                           </div>
                           <div className="text-right font-bold text-emerald-400">₹{subtotal.toLocaleString('en-IN', {maximumFractionDigits: 0})}</div>
                           <button onClick={() => removeProduct(sp.id)} className="ml-auto text-red-400 hover:text-red-300 font-semibold text-sm md:col-span-1">Remove</button>
