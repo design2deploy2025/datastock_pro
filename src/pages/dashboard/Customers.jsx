@@ -111,6 +111,8 @@ const Customers = () => {
 const [sortOrder, setSortOrder] = React.useState('asc');
   const [selectedCustomer, setSelectedCustomer] = React.useState(null);
   const [showCreateOrderModal, setShowCreateOrderModal] = React.useState(false);
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [editCustomer, setEditCustomer] = React.useState({});
 
   const { user, profile, logout } = useAuth();
   const navigate = useNavigate();
@@ -221,8 +223,55 @@ const [sortOrder, setSortOrder] = React.useState('asc');
     navigate('/login');
   };
 
+  const getAvatar = (name) => {
+    if (!name) return '';
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name.split(' ').map(n => n[0]).join(''))}&background=1e293b&color=f8fafc&size=128&bold=true`;
+  };
+
+  const handleEditStart = () => {
+    setEditCustomer({ ...selectedCustomer });
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditCustomer({});
+  };
+
+  const validateEdit = () => {
+    const { name, instagram, phone, address } = editCustomer;
+    if (!name?.trim() || !instagram?.trim() || !phone?.trim() || !address?.trim()) {
+      return false;
+    }
+    return true;
+  };
+
+  const handleSaveEdit = () => {
+    if (!validateEdit()) {
+      alert('Please fill all fields: name, instagram, phone, address.');
+      return;
+    }
+
+    setCustomersList(prev => prev.map(cust => 
+      cust.id === selectedCustomer.id 
+        ? { ...cust, ...editCustomer, avatar: getAvatar(editCustomer.name) }
+        : cust
+    ));
+
+    setSelectedCustomer(prev => ({ ...prev, ...editCustomer, avatar: getAvatar(editCustomer.name) }));
+    setIsEditing(false);
+    setEditCustomer({});
+  };
+
+  const handleEditChange = (field) => (e) => {
+    const value = e.target.value;
+    setEditCustomer(prev => ({ ...prev, [field]: value }));
+  };
+
   const closeModal = () => {
     setSelectedCustomer(null);
+    setIsEditing(false);
+    setEditCustomer({});
   };
 
   const orderCount = selectedCustomer?.orders?.length || 0;
@@ -321,17 +370,28 @@ const [sortOrder, setSortOrder] = React.useState('asc');
                 <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 lg:gap-6">
                   <div className="flex items-center gap-4 lg:gap-6">
                     <img 
-                      src={selectedCustomer.avatar} 
-                      alt={selectedCustomer.name}
+                      src={isEditing ? getAvatar(editCustomer.name) : selectedCustomer.avatar} 
+                      alt={isEditing ? editCustomer.name : selectedCustomer.name}
                       className="w-16 h-16 lg:w-20 lg:h-20 rounded-2xl ring-2 ring-white/20 shadow-lg flex-shrink-0 hover:scale-105 transition-transform duration-200"
                       onError={(e) => {
-                        e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedCustomer.name.split(' ').map(n => n[0]).join(''))}&background=475569&color=f8fafc&size=128&bold=true`;
+                        e.target.src = getAvatar(isEditing ? editCustomer.name : selectedCustomer.name);
                       }}
                     />
                     <div>
-                      <h2 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent leading-tight">
-                        {selectedCustomer.name}
-                      </h2>
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          value={editCustomer.name || ''}
+                          onChange={handleEditChange('name')}
+                          className="text-2xl lg:text-3xl font-bold bg-transparent border-b border-white/30 focus:border-white focus:outline-none bg-slate-900/50 px-2 py-1 text-transparent bg-clip-text from-white to-slate-200 leading-tight w-full"
+                          placeholder="Enter customer name"
+                          autoFocus
+                        />
+                      ) : (
+                        <h2 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent leading-tight">
+                          {selectedCustomer.name}
+                        </h2>
+                      )}
                       <p className="text-sm lg:text-base text-slate-400 mt-1 font-medium">
                         {orderCount} orders • Avg order ₹{avgOrder.toLocaleString()}
                       </p>
@@ -351,33 +411,59 @@ const [sortOrder, setSortOrder] = React.useState('asc');
                   {/* 4 Contact Blocks in Single Row */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {/* Instagram */}
-                    <div className="group p-4 bg-slate-800/50 hover:bg-slate-700/50 rounded-xl border border-white/10 transition-all cursor-pointer" onClick={async () => {
-                      await navigator.clipboard.writeText(selectedCustomer.instagram);
-                    }}>
+                    <div className={isEditing ? 'p-4 bg-slate-800/70 rounded-xl border-2 border-yellow-400/50' : 'group p-4 bg-slate-800/50 hover:bg-slate-700/50 rounded-xl border border-white/10 transition-all cursor-pointer'}>
                       <div className="flex items-center gap-2 mb-2">
                         <svg className="w-5 h-5 text-pink-400 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.921.146-6.462 2.556-6.61 6.611-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.148 4.955 2.683 6.611 6.61 6.61 1.28.059 1.688.073 4.948.073 3.259 0 3.668-.014 4.948-.072 4.924-.146 6.464-2.541 6.61-6.61.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.146-4.92-2.556-6.61-6.611-6.61-1.28-.059-1.689-.073-4.948-.073z"/>
                           <path d="M12 5.839c-2.847 0-5.158 2.311-5.158 5.158s2.311 5.158 5.158 5.158 5.158-2.311 5.158-5.158-2.311-5.158-5.158-5.158z"/>
                           <path d="M15.663 11.998h-1.68v-1.679h2.928v1.679h-1.248v3.553h-1.001V11.998z"/>
                         </svg>
-                        <span className="font-semibold text-slate-200 group-hover:text-pink-400 transition-colors text-sm">Instagram</span>
+                        <span className="font-semibold text-slate-200 text-sm">Instagram</span>
                       </div>
-                      <p className="text-slate-300 font-mono text-sm break-all">{selectedCustomer.instagram}</p>
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          value={editCustomer.instagram || ''}
+                          onChange={handleEditChange('instagram')}
+                          className="w-full bg-slate-900/80 backdrop-blur-sm border border-yellow-400/50 rounded-lg px-3 py-2 text-slate-200 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400/70 transition-all"
+                          placeholder="@username"
+                        />
+                      ) : (
+                        <p 
+                          className="text-slate-300 font-mono text-sm break-all cursor-pointer hover:text-pink-300 transition-colors"
+                          onClick={async () => await navigator.clipboard.writeText(selectedCustomer.instagram)}
+                        >
+                          {selectedCustomer.instagram}
+                        </p>
+                      )}
                     </div>
                     {/* Phone */}
-                    <div className="group p-4 bg-slate-800/50 hover:bg-slate-700/50 rounded-xl border border-white/10 transition-all cursor-pointer" onClick={async () => {
-                      await navigator.clipboard.writeText(selectedCustomer.phone);
-                    }}>
+                    <div className={isEditing ? 'p-4 bg-slate-800/70 rounded-xl border-2 border-yellow-400/50' : 'group p-4 bg-slate-800/50 hover:bg-slate-700/50 rounded-xl border border-white/10 transition-all cursor-pointer'}>
                       <div className="flex items-center gap-2 mb-2">
                         <svg className="w-5 h-5 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                         </svg>
-                        <span className="font-semibold text-slate-200 group-hover:text-emerald-400 transition-colors text-sm">Phone</span>
+                        <span className="font-semibold text-slate-200 text-sm">Phone</span>
                       </div>
-                      <p className="text-slate-300 font-mono text-sm">{selectedCustomer.phone}</p>
+                      {isEditing ? (
+                        <input
+                          type="tel"
+                          value={editCustomer.phone || ''}
+                          onChange={handleEditChange('phone')}
+                          className="w-full bg-slate-900/80 backdrop-blur-sm border border-yellow-400/50 rounded-lg px-3 py-2 text-slate-200 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400/70 transition-all"
+                          placeholder="+91 98765 43210"
+                        />
+                      ) : (
+                        <p 
+                          className="text-slate-300 font-mono text-sm cursor-pointer hover:text-emerald-300 transition-colors"
+                          onClick={async () => await navigator.clipboard.writeText(selectedCustomer.phone)}
+                        >
+                          {selectedCustomer.phone}
+                        </p>
+                      )}
                     </div>
                     {/* Address */}
-                    <div className="p-4 bg-slate-800/30 rounded-xl border border-white/10">
+                    <div className={isEditing ? 'p-4 bg-slate-800/70 rounded-xl border-2 border-yellow-400/50 sm:col-span-2 lg:col-span-1' : 'p-4 bg-slate-800/30 rounded-xl border border-white/10 sm:col-span-2 lg:col-span-1'}>
                       <div className="flex items-center gap-2 mb-2">
                         <svg className="w-5 h-5 text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -385,7 +471,17 @@ const [sortOrder, setSortOrder] = React.useState('asc');
                         </svg>
                         <span className="font-semibold text-slate-200 text-sm">Address</span>
                       </div>
-                      <p className="text-slate-300 text-sm leading-relaxed">{selectedCustomer.address}</p>
+                      {isEditing ? (
+                        <textarea
+                          value={editCustomer.address || ''}
+                          onChange={handleEditChange('address')}
+                          rows={2}
+                          className="w-full bg-slate-900/80 backdrop-blur-sm border border-yellow-400/50 rounded-lg px-3 py-2 text-slate-200 text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-yellow-400/70 transition-all resize-vertical"
+                          placeholder="Enter full address"
+                        />
+                      ) : (
+                        <p className="text-slate-300 text-sm leading-relaxed">{selectedCustomer.address}</p>
+                      )}
                     </div>
                     {/* LTV */}
                     <div className="p-4 bg-gradient-to-br from-emerald-500/10 to-emerald-600/20 border border-emerald-400/30 rounded-xl text-center">
@@ -453,21 +549,50 @@ const [sortOrder, setSortOrder] = React.useState('asc');
                 {/* Footer Actions */}
                 <div className="p-6 border-t border-white/10 bg-slate-900/95 backdrop-blur-sm sticky bottom-0">
                   <div className="flex flex-col sm:flex-row gap-3">
-                    <button className="flex-1 px-6 py-4 bg-slate-700/50 hover:bg-slate-600 text-slate-200 font-semibold rounded-xl transition-all border border-white/20 flex items-center justify-center gap-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                      Edit Details
-                    </button>
-                    <button 
-                      onClick={() => setShowCreateOrderModal(true)}
-                      className="flex-1 px-6 py-4 bg-emerald-600/80 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-all border border-emerald-400/30 flex items-center justify-center gap-2 shadow-lg hover:shadow-emerald-500/25"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                      </svg>
-                      Create Order
-                    </button>
+                    {isEditing ? (
+                      <>
+                        <button 
+                          onClick={handleCancelEdit}
+                          className="flex-1 px-6 py-4 bg-slate-700/50 hover:bg-slate-600 text-slate-200 font-semibold rounded-xl transition-all border border-white/20 flex items-center justify-center gap-2"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                          Cancel
+                        </button>
+                        <button 
+                          onClick={handleSaveEdit}
+                          disabled={!validateEdit()}
+                          className="flex-1 px-6 py-4 bg-emerald-600/80 hover:bg-emerald-500 disabled:bg-emerald-700/50 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-all border border-emerald-400/30 flex items-center justify-center gap-2 shadow-lg hover:shadow-emerald-500/25"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          Save Changes
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button 
+                          onClick={handleEditStart}
+                          className="flex-1 px-6 py-4 bg-blue-600/80 hover:bg-blue-500 text-white font-semibold rounded-xl transition-all border border-blue-400/30 flex items-center justify-center gap-2 shadow-lg hover:shadow-blue-500/25"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                          Edit Details
+                        </button>
+                        <button 
+                          onClick={() => setShowCreateOrderModal(true)}
+                          className="flex-1 px-6 py-4 bg-emerald-600/80 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-all border border-emerald-400/30 flex items-center justify-center gap-2 shadow-lg hover:shadow-emerald-500/25"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                          </svg>
+                          Create Order
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
             </div>
