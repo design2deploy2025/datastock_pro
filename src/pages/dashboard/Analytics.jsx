@@ -2,6 +2,9 @@ import React from 'react';
 import Sidebar from '../../components/sidebar/Sidebar';
 import TotalSoldAnalytics from '../../components/dashboard/TotalSoldAnalytics';
 import TopProductsAnalytics from '../../components/dashboard/TopProductsAnalytics';
+import LowStockProductsAnalytics from '../../components/dashboard/LowStockProductsAnalytics';
+import TotalRevenueAnalytics from '../../components/dashboard/TotalRevenueAnalytics';
+
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -22,10 +25,15 @@ const Analytics = () => {
               Track total quantity sold across lifetime, daily, and monthly views with interactive trend graphs.
             </p>
           </div>
-<TotalSoldAnalytics />
+          <TotalSoldAnalytics />
+          <TotalRevenueAnalytics />
           <div className="mt-16 pt-12 border-t border-white/10">
             <TopProductsAnalytics />
           </div>
+          <div className="mt-16 pt-12 border-t border-white/10">
+            <LowStockProductsAnalytics />
+          </div>
+
         </div>
       </main>
     </div>

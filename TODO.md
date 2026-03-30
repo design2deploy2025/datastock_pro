@@ -1,9 +1,9 @@
-# Task Progress: Simplify Top 5 Products UI
+# Total Revenue Analytics Implementation
 
-## Revision Steps (per feedback):
-- [x] 1. Update `src/components/dashboard/TopProductsAnalytics.jsx` to simple list + toggle (Lifetime/Day/Month)
-- [x] 2. Task completed ✅
-
-## Current Status:
-Previous fancy UI replaced with minimal list view (#1-#5 name + quantity).
+## Steps:
+- [x] 1. Create `src/components/dashboard/TotalRevenueAnalytics.jsx` mirroring TotalSoldAnalytics UI with revenue data.
+- [x] 2. Update `src/pages/dashboard/Analytics.jsx` to import and render TotalRevenueAnalytics after TotalSoldAnalytics.
+- [ ] 3. Verify layout matches (3 cards: Lifetime/Teal, Today/Emerald, Monthly/Pink).
+- [ ] 4. Test in browser.
+- [ ] 5. Mark complete.
 
