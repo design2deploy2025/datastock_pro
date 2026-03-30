@@ -1,6 +1,7 @@
 import React from 'react';
 import Sidebar from '../../components/sidebar/Sidebar';
 import TotalSoldAnalytics from '../../components/dashboard/TotalSoldAnalytics';
+import TopProductsAnalytics from '../../components/dashboard/TopProductsAnalytics';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -21,7 +22,10 @@ const Analytics = () => {
               Track total quantity sold across lifetime, daily, and monthly views with interactive trend graphs.
             </p>
           </div>
-          <TotalSoldAnalytics />
+<TotalSoldAnalytics />
+          <div className="mt-16 pt-12 border-t border-white/10">
+            <TopProductsAnalytics />
+          </div>
         </div>
       </main>
     </div>
