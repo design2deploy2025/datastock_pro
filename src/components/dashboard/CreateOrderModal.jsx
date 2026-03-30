@@ -45,6 +45,7 @@ const CreateOrderModal = ({
 
   // Local state (override props if needed for standalone)
   const [customer, setCustomer] = useState(propCustomer || null);
+  const [orderIdMode, setOrderIdMode] = useState(propOrder?.orderIdMode || 'system');
   const [orderId, setOrderId] = useState(propOrder?.displayId || '');
   const [orderDate, setOrderDate] = useState(propOrder?.date || '');
   const [orderStatus, setOrderStatus] = useState(propOrder?.status || '');
@@ -53,7 +54,23 @@ const CreateOrderModal = ({
   const [selectedProducts, setSelectedProducts] = useState(propOrder?.products || []);
   const [productSearch, setProductSearch] = useState('');
   const [customerSearch, setCustomerSearch] = useState('');
+
   const [showCreateCustomerModal, setShowCreateCustomerModal] = useState(false);
+
+  // Order ID generation
+  const generateOrderId = () => {
+    const now = new Date();
+    const dateStr = now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0');
+    const seq = Math.floor(Math.random() * 900) + 100;
+    return `ORD-${dateStr}-${seq}`;
+  };
+
+  // Auto-generate on system mode
+  React.useEffect(() => {
+    if (!isView && orderIdMode === 'system' && (!orderId || orderIdMode === 'system')) {
+      setOrderId(generateOrderId());
+    }
+  }, [orderIdMode]);
 
   // Sync local state to parent props
   React.useEffect(() => {
@@ -61,6 +78,7 @@ const CreateOrderModal = ({
       const syncField = (name, value) => {
         propHandleNewOrderChange({ target: { name, value } });
       };
+      syncField('orderIdMode', orderIdMode);
       syncField('orderId', orderId);
       syncField('date', orderDate);
       syncField('status', orderStatus);
@@ -68,7 +86,7 @@ const CreateOrderModal = ({
       syncField('source', source);
       syncField('items', JSON.stringify(selectedProducts));
     }
-  }, [orderId, orderDate, orderStatus, paymentStatus, source, selectedProducts, propSetNewOrder, propHandleNewOrderChange]);
+  }, [orderIdMode, orderId, orderDate, orderStatus, paymentStatus, source, selectedProducts, propSetNewOrder, propHandleNewOrderChange]);
 
   const filteredProducts = mockProducts.filter(p => 
     p.name.toLowerCase().includes(productSearch.toLowerCase())
@@ -105,9 +123,17 @@ const CreateOrderModal = ({
   };
 
   const handleSave = () => {
+    if (orderIdMode === 'manual' && !orderId.trim()) {
+      alert('Please enter Order ID or switch to Auto generation.');
+      return;
+    }
+    if (!orderDate || selectedProducts.length === 0 || !customer) {
+      alert('Please fill all required fields: Date, Customer, and at least one Product.');
+      return;
+    }
     const orderData = {
       id: Date.now(),
-      customerName: customer?.name || '',
+      orderIdMode,
       displayId: orderId,
       date: orderDate,
       status: orderStatus,
@@ -123,7 +149,8 @@ const CreateOrderModal = ({
     onSaveOrder?.(orderData);
     // Show success
     console.log('✅ Order saved:', orderData);
-    alert(`Order ${orderId || 'New'} saved successfully! Total: ₹${totalValue.toLocaleString('en-IN')}`);
+    alert(`Order ${orderId} saved successfully! Total: ₹${totalValue.toLocaleString('en-IN')}`);
+    onClose();
   };
 
   const getCustomerAvatar = (name) => {
@@ -148,16 +175,51 @@ const CreateOrderModal = ({
                   className="w-16 h-16 lg:w-20 lg:h-20 rounded-2xl ring-2 ring-white/20 shadow-lg flex-shrink-0 hover:scale-105 transition-transform duration-200"
                 />
                 <div>
-                  <h2 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent leading-tight">
+                  <h2 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent leading-tight flex flex-wrap items-center gap-2">
                     {isView ? 'Order Details' : isEdit ? 'Edit Order' : 'New Order'}
                     {!isView && (
-                      <input
-                        type="text"
-                        value={orderId}
-                        onChange={(e) => setOrderId(e.target.value)}
-                        className="ml-2 text-emerald-400 font-mono text-sm bg-transparent border-b border-emerald-400/50 focus:border-emerald-400"
-                        placeholder="#001"
-                      />
+                      <>
+                        <input
+                          type="text"
+                          value={orderId}
+                          onChange={(e) => setOrderId(e.target.value)}
+                          disabled={orderIdMode === 'system'}
+                          className={`font-mono text-sm bg-transparent border-b focus:border-emerald-400 transition-all ${orderIdMode === 'system' 
+                            ? 'text-slate-400 border-slate-500/50 cursor-not-allowed' 
+                            : 'text-emerald-400 border-emerald-400/50 hover:border-emerald-400 focus:border-emerald-400'}`}
+                          placeholder="#001"
+                        />
+                        {!isView && (
+                          <div className="flex items-center gap-1 bg-slate-800/50 rounded-lg p-1">
+                            <label className="text-xs font-medium text-slate-300 flex items-center gap-1 cursor-pointer group">
+                              <input
+                                type="radio"
+                                value="system"
+                                checked={orderIdMode === 'system'}
+                                onChange={(e) => setOrderIdMode(e.target.value)}
+                                className="sr-only peer"
+                              />
+                              <div className="w-10 h-5 bg-slate-600 peer-checked:bg-emerald-600 rounded-full p-0.5 transition-all duration-200 peer-checked:ring-2 ring-emerald-400/30 peer-focus:ring-emerald-400/50">
+                                <div className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-all duration-200 relative ${orderIdMode === 'system' ? 'translate-x-5' : ''}`} />
+                              </div>
+                              <span className="text-xs group-hover:text-emerald-300 transition-colors">Auto</span>
+                            </label>
+                            <label className="text-xs font-medium text-slate-300 flex items-center gap-1 cursor-pointer group">
+                              <input
+                                type="radio"
+                                value="manual"
+                                checked={orderIdMode === 'manual'}
+                                onChange={(e) => setOrderIdMode(e.target.value)}
+                                className="sr-only peer"
+                              />
+                              <div className="w-10 h-5 bg-slate-600 peer-checked:bg-blue-600 rounded-full p-0.5 transition-all duration-200 peer-checked:ring-2 ring-blue-400/30 peer-focus:ring-blue-400/50">
+                                <div className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-all duration-200 relative ${orderIdMode === 'manual' ? 'translate-x-5' : ''}`} />
+                              </div>
+                              <span className="text-xs group-hover:text-blue-300 transition-colors">Manual</span>
+                            </label>
+                          </div>
+                        )}
+                      </>
                     )}
                   </h2>
                   <p className="text-sm lg:text-base text-slate-400 mt-1 font-medium">
@@ -185,15 +247,40 @@ const CreateOrderModal = ({
                   <span className="font-semibold text-slate-200 text-sm">Order ID</span>
                 </div>
                 {isView ? (
-                  <p className="text-emerald-300 font-mono text-sm font-semibold">{propOrder?.displayId || 'N/A'}</p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-emerald-300 font-mono text-sm font-semibold">{propOrder?.displayId || 'N/A'}</span>
+                    {propOrder?.orderIdMode === 'system' && (
+                      <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 text-xs rounded-full font-medium border border-emerald-400/30">Auto</span>
+                    )}
+                    {propOrder?.orderIdMode === 'manual' && (
+                      <span className="px-2 py-0.5 bg-blue-500/20 text-blue-300 text-xs rounded-full font-medium border border-blue-400/30">Manual</span>
+                    )}
+                  </div>
                 ) : (
-                  <input
-                    type="text"
-                    value={orderId}
-                    onChange={(e) => setOrderId(e.target.value)}
-                    className="w-full bg-slate-900/80 backdrop-blur-sm border border-emerald-400/50 rounded-lg px-3 py-2 text-emerald-300 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400/70 transition-all font-semibold"
-                    placeholder="ORD-20241020-001"
-                  />
+                  <>
+                    <input
+                      type="text"
+                      value={orderId}
+                      onChange={(e) => setOrderId(e.target.value)}
+                      disabled={orderIdMode === 'system'}
+                      className={`w-full bg-slate-900/80 backdrop-blur-sm border rounded-lg px-3 py-2 text-emerald-300 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400/70 transition-all font-semibold ${orderIdMode === 'system' 
+                        ? 'border-slate-500/50 cursor-not-allowed bg-slate-900/50' 
+                        : 'border-emerald-400/50 hover:border-emerald-400/70'}`}
+                      placeholder="ORD-20241020-001"
+                    />
+                    {orderIdMode === 'system' && (
+                      <button
+                        onClick={() => setOrderId(generateOrderId())}
+                        className="mt-2 w-full px-3 py-1.5 bg-emerald-600/80 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1 shadow-md hover:shadow-emerald-500/25"
+                        title="Regenerate Order ID"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        Regen ID
+                      </button>
+                    )}
+                  </>
                 )}
               </div>
 
