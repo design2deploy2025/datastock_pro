@@ -1,19 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Sidebar from '../../components/sidebar/Sidebar';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import CreateProductModal from '../../components/dashboard/CreateProductModal';
 
 const Products = () => {
   const { user, profile, logout } = useAuth();
   const navigate = useNavigate();
+  const [showProductModal, setShowProductModal] = useState(false);
 
   const handleLogout = async () => {
     await logout();
     navigate('/login');
   };
 
-  // Dummy products data - UNCHANGED
-  const products = [
+  // Dummy products data - UI only
+  const [products, setProducts] = useState([
     {
       id: 1,
       img: 'https://placehold.co/400x250/1a1a1a/white/Wireless%20Keyboard?font=roboto',
@@ -110,7 +112,7 @@ const Products = () => {
       desc: 'Insulated 500ml stainless steel bottle keeps drinks cold for 24hrs.',
       tags: ['eco-friendly', 'insulated']
     }
-  ];
+  ]);
 
   const ProductCard = ({ img, name, sku, price, quantity, category, total_sold, desc, tags }) => (
     <div className="group bg-slate-900/80 border border-slate-800/50 rounded-2xl p-6 hover:bg-slate-900 hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-500/10 hover:scale-[1.02] transition-all duration-300 overflow-hidden">
@@ -134,9 +136,8 @@ const Products = () => {
         </span>
       </div>
       
-      {/* Stats Row: 3 columns, aligned */}
+      {/* Stats Row: 3 columns */}
       <div className="grid grid-cols-3 gap-4 mb-4 p-4 bg-slate-800/50 rounded-xl">
-        {/* Stock */}
         <div className="text-center">
           <div className="w-10 h-10 mx-auto mb-1 bg-emerald-500/20 rounded-lg flex items-center justify-center">
             <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -146,8 +147,6 @@ const Products = () => {
           <div className="text-lg font-bold text-white">{quantity}</div>
           <div className="text-xs text-slate-400 uppercase tracking-wide">Stock</div>
         </div>
-        
-        {/* Category */}
         <div className="text-center">
           <div className="w-10 h-10 mx-auto mb-1 bg-blue-500/20 rounded-lg flex items-center justify-center">
             <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -157,8 +156,6 @@ const Products = () => {
           <div className="text-sm font-semibold text-white truncate">{category}</div>
           <div className="text-xs text-slate-400 uppercase tracking-wide">Category</div>
         </div>
-        
-        {/* Sold */}
         <div className="text-center">
           <div className="w-10 h-10 mx-auto mb-1 bg-orange-500/20 rounded-lg flex items-center justify-center">
             <svg className="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -170,10 +167,8 @@ const Products = () => {
         </div>
       </div>
       
-      {/* Description */}
       <p className="text-sm text-slate-300 mb-4 line-clamp-2 leading-relaxed">{desc}</p>
       
-      {/* Tags */}
       <div className="flex flex-wrap gap-2">
         {tags.map((tag, idx) => (
           <span 
@@ -192,7 +187,6 @@ const Products = () => {
       <Sidebar />
       <main className="ml-0 md:ml-64 p-8 md:p-12 flex flex-col min-h-screen">
         <div className="flex-1">
-          {/* Header - UNCHANGED */}
           <div className="mb-12">
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent mb-4">
               Products
@@ -206,13 +200,28 @@ const Products = () => {
                 placeholder="Search products..." 
                 className="flex-1 px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white/50 focus:backdrop-blur-sm transition-all"
               />
-              <button className="px-8 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-emerald-500/25 transition-all">
+              <button 
+                onClick={() => setShowProductModal(true)}
+                className="px-8 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-emerald-500/25 transition-all"
+              >
                 + Add Product
               </button>
             </div>
+
+            {showProductModal && (
+              <CreateProductModal 
+                isOpen={showProductModal}
+                onClose={() => setShowProductModal(false)}
+                onSaveProduct={(newProduct) => {
+                  setProducts(prev => [newProduct, ...prev]);
+                  setShowProductModal(false);
+                  alert(`✅ Product "${newProduct.name}" added successfully!`);
+                  console.log('New product added:', newProduct);
+                }}
+              />
+            )}
           </div>
           
-          {/* Products Grid - UPDATED to 3 per row on lg */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {products.map((product) => (
               <ProductCard key={product.id} {...product} />
