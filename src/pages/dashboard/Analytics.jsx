@@ -26,13 +26,13 @@ const Analytics = () => {
               </div>
           <TotalSoldAnalytics />
           <TotalRevenueAnalytics />
-          <div className="mt-16 pt-12 border-t border-white/10">
+          <div>
             <TopCustomersAnalytics />
           </div>
-          <div className="mt-16 pt-12 border-t border-white/10">  
+          <div>  
             <TopProductsAnalytics />  
           </div>
-          <div className="mt-16 pt-12 border-t border-white/10">
+          <div>
             <LowStockProductsAnalytics />
           </div>
 

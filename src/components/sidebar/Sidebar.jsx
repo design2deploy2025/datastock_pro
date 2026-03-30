@@ -70,7 +70,7 @@ const Sidebar = () => {
         
         <Link 
           to="/feedback" 
-          className={`flex items-center gap-3 p-2.5 rounded-lg transition-all font-medium group ${location.pathname === '/feedback' ? 'bg-slate-800/70 hover:bg-slate-700/70 text-white' : 'hover:bg-slate-700/50 text-slate-300 hover:text-white'}`}
+          className={`flex mb-8 items-center gap-3 p-2.5 rounded-lg transition-all font-medium group ${location.pathname === '/feedback' ? 'bg-slate-800/70 hover:bg-slate-700/70 text-white' : 'hover:bg-slate-700/50 text-slate-300 hover:text-white'}`}
         >
           <ChatBubbleLeftIcon className="h-5 w-5 text-slate-300 group-hover:text-white" />
           <span>Feedback</span>

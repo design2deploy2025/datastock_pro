@@ -42,17 +42,17 @@ const LowStockProductsAnalytics = () => {
   };
 
   return (
-    <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+    <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8 gap-4">
-        <div>
-          <h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-red-400 to-yellow-400 bg-clip-text text-transparent mb-2">
-            ⚠️ Top 5 Low Stock
-          </h2>
-          <p className="text-lg text-slate-400">
-            {viewModeLabels[viewMode]} lowest stock products
-          </p>
-        </div>
+        
+
+         <div> 
+                <h1 className="text-3xl md:text-4xl font-semibold text-white mb-4">
+                  Top 5 Low Stock
+                </h1>
+                <p className="text-slate-400">{viewModeLabels[viewMode]} lowest stock products</p>
+              </div>
         
         {/* Toggle Buttons - single for now */}
         <div className="flex bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-1">
