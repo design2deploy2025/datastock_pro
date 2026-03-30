@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Sidebar from '../../components/sidebar/Sidebar';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -9,6 +9,15 @@ const Products = () => {
   const navigate = useNavigate();
   const [showProductModal, setShowProductModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+
+  // Filter states
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('name');
+  const [sortOrder, setSortOrder] = useState('asc');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [minStock, setMinStock] = useState('');
+  const [maxStock, setMaxStock] = useState('');
 
   const handleLogout = async () => {
     await logout();
@@ -28,7 +37,7 @@ const Products = () => {
     console.log('Product updated:', updatedProduct);
   };
 
-  // Dummy products data - UI only
+  // Dummy products data - UI only (moved up to avoid TDZ)
   const [products, setProducts] = useState([
     {
       id: 1,
@@ -136,6 +145,60 @@ const Products = () => {
     }
   ]);
 
+  // Get unique categories and statuses
+  const categories = Array.from(new Set(products.map(p => p.category)));
+  const statuses = Array.from(new Set(products.map(p => p.status)));
+
+  // Filtered and sorted products
+  const filteredProducts = useMemo(() => {
+    let result = products.filter(product => {
+      // Search filter
+      const matchesSearch = 
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.desc.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+
+      // Category filter
+      const matchesCategory = categoryFilter === 'all' || product.category === categoryFilter;
+
+      // Status filter
+      const matchesStatus = statusFilter === 'all' || product.status === statusFilter;
+
+      // Stock range filter
+      const stock = product.quantity;
+      const min = minStock ? parseInt(minStock) : 0;
+      const max = maxStock ? parseInt(maxStock) : Infinity;
+      const matchesStock = stock >= min && stock <= max;
+
+      return matchesSearch && matchesCategory && matchesStatus && matchesStock;
+    });
+
+    // Sort
+    result.sort((a, b) => {
+      let aVal, bVal;
+      switch(sortBy) {
+        case 'name': aVal = a.name; bVal = b.name; break;
+        case 'sku': aVal = a.sku; bVal = b.sku; break;
+        case 'price': 
+          aVal = parseFloat(a.price.replace(/[^\d.]/g, '')); 
+          bVal = parseFloat(b.price.replace(/[^\d.]/g, '')); 
+          break;
+        case 'stock': aVal = a.quantity; bVal = b.quantity; break;
+        case 'sold': aVal = a.total_sold; bVal = b.total_sold; break;
+        case 'category': aVal = a.category; bVal = b.category; break;
+        case 'status': aVal = a.status; bVal = b.status; break;
+        default: aVal = a.name; bVal = b.name;
+      }
+      if (sortOrder === 'desc') {
+        return aVal > bVal ? -1 : 1;
+      }
+      return aVal > bVal ? 1 : -1;
+    });
+
+    return result;
+  }, [products, searchTerm, sortBy, sortOrder, categoryFilter, statusFilter, minStock, maxStock]);
+
   const getStatusColor = (status) => {
     switch(status) {
       case 'Active': return 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30';
@@ -239,15 +302,137 @@ const Products = () => {
             <p className="text-xl text-gray-400 mb-6 max-w-2xl">
               Manage your products and inventory with ease. View details and stock status.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <input 
-                type="text" 
-                placeholder="Search products..." 
-                className="flex-1 px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white/50 focus:backdrop-blur-sm transition-all"
-              />
+            {/* Filters Section - Matching OrdersTable/CustomersTable UI */}
+            <div className="space-y-6 mb-12">
+              {/* Search & Sort */}
+              <div className="bg-slate-900/30 backdrop-blur-sm rounded-2xl border border-white/20 p-6">
+                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                  <input
+                    type="text"
+                    placeholder="Search name, SKU, description or tags..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="flex-1 min-w-64 bg-slate-800/50 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
+                  />
+                  <div className="flex gap-2 flex-wrap">
+                    {['name', 'sku', 'price', 'stock', 'sold', 'category', 'status'].map(field => (
+                      <button
+                        key={field}
+                        onClick={() => {
+                          if (sortBy === field) {
+                            setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+                          } else {
+                            setSortBy(field);
+                            setSortOrder('asc');
+                          }
+                        }}
+                        className={`px-4 py-2 text-sm font-medium rounded-xl border transition-all ${
+                          sortBy === field
+                            ? 'bg-emerald-500/20 border-emerald-400 text-emerald-200 shadow-md'
+                            : 'bg-slate-800/50 border-white/10 hover:bg-slate-700/50 hover:border-white/20 text-slate-200'
+                        }`}
+                      >
+                        {field === 'name' && 'Name'}
+                        {field === 'sku' && 'SKU'}
+                        {field === 'price' && 'Price'}
+                        {field === 'stock' && 'Stock'}
+                        {field === 'sold' && 'Sold'}
+                        {field === 'category' && 'Category'}
+                        {field === 'status' && 'Status'}
+                        {sortBy === field && (sortOrder === 'desc' ? ' ↓' : ' ↑')}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Filters */}
+              <div className="bg-slate-900/30 backdrop-blur-sm rounded-2xl border border-white/20 p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* Category Filter */}
+                  <div>
+                    <label className="block text-xs text-slate-400 uppercase tracking-wide font-medium mb-2">Category</label>
+                    <select
+                      value={categoryFilter}
+                      onChange={(e) => setCategoryFilter(e.target.value)}
+                      className="w-full bg-slate-800/50 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
+                    >
+                      <option value="all">All Categories</option>
+                      {categories.map(cat => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Status Filter */}
+                  <div>
+                    <label className="block text-xs text-slate-400 uppercase tracking-wide font-medium mb-2">Status</label>
+                    <select
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value)}
+                      className="w-full bg-slate-800/50 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
+                    >
+                      <option value="all">All Statuses</option>
+                      {statuses.map(stat => (
+                        <option key={stat} value={stat}>{stat}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Min Stock */}
+                  <div>
+                    <label className="block text-xs text-slate-400 uppercase tracking-wide font-medium mb-2">Min Stock</label>
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="0"
+                      value={minStock}
+                      onChange={(e) => setMinStock(e.target.value)}
+                      className="w-full bg-slate-800/50 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                    />
+                  </div>
+
+                  {/* Max Stock */}
+                  <div>
+                    <label className="block text-xs text-slate-400 uppercase tracking-wide font-medium mb-2">Max Stock</label>
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="∞"
+                      value={maxStock}
+                      onChange={(e) => setMaxStock(e.target.value)}
+                      className="w-full bg-slate-800/50 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all"
+                    />
+                  </div>
+                </div>
+
+                {/* Clear Filters Button */}
+                {(searchTerm || categoryFilter !== 'all' || statusFilter !== 'all' || minStock || maxStock) && (
+                  <button
+                    onClick={() => {
+                      setSearchTerm('');
+                      setCategoryFilter('all');
+                      setStatusFilter('all');
+                      setMinStock('');
+                      setMaxStock('');
+                      setSortBy('name');
+                      setSortOrder('asc');
+                    }}
+                    className="mt-4 px-6 py-3 bg-slate-700/50 hover:bg-slate-600 text-slate-200 font-semibold rounded-xl transition-all border border-white/20 flex items-center justify-center gap-2 ml-auto"
+                  >
+                    Clear All Filters
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-8">
+              <div className="text-sm text-slate-400">
+                Showing {filteredProducts.length} of {products.length} products
+              </div>
               <button 
                 onClick={() => setShowProductModal(true)}
-                className="px-8 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-emerald-500/25 transition-all"
+                className="px-8 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-emerald-500/25 transition-all whitespace-nowrap"
               >
                 + Add Product
               </button>
@@ -281,9 +466,16 @@ const Products = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            {products.map((product) => (
-              <ProductCard key={product.id} {...product} />
-            ))}
+            {filteredProducts.length === 0 ? (
+              <div className="col-span-full text-center py-20">
+                <p className="text-slate-400 text-xl mb-4">No products found matching your filters.</p>
+                <p className="text-slate-500 text-sm">Try adjusting your search, filters or sort options above.</p>
+              </div>
+            ) : (
+              filteredProducts.map((product) => (
+                <ProductCard key={product.id} {...product} />
+              ))
+            )}
           </div>
         </div>
       </main>
