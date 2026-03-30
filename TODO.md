@@ -1,9 +1,13 @@
-# Task Progress: Fix handleRowClick error in Orders.jsx
+# Create Order Modal Implementation Plan
 
-## Plan Steps:
-- [x] 1. Understand files with search/read
-- [x] 2. Create plan and get approval
-- [x] 3. Add handleRowClick function to Orders.jsx  
-- [x] 4. Test in browser (user to refresh /orders)
-- [x] 5. Handle any remaining issues (e.g. 403 - likely RLS policy on profiles; supabase.js uses anon key, check dashboard policies)
+## Overview
+Recreate `src/components/dashboard/CreateOrderModal.jsx` from scratch with **exact UI/layout** of customer detail modal from `Customers.jsx`.
 
+## Steps
+- [ ] **Step 1:** Create new CreateOrderModal.jsx matching customer modal structure (header, 4-col cards, products section, stats, footer).
+- [ ] **Step 2:** Test modal opening from Orders.jsx "New Order" button.
+- [ ] **Step 3:** Test modal from Customers.jsx (customer row → Create Order).
+- [ ] **Step 4:** Verify form submission, calculations, responsive layout.
+- [ ] **Step 5:** Complete - attempt_completion.
+
+**Current Progress:** Starting Step 1
