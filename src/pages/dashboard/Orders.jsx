@@ -10,24 +10,50 @@ const Orders = () => {
   const navigate = useNavigate();
 
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [modalMode, setModalMode] = useState('view'); // 'view' | 'edit' | 'create'
   const [showCreateOrderModal, setShowCreateOrderModal] = useState(false);
-  const [newOrder, setNewOrder] = useState({ date: '', items: '', qty: '', unitPrice: '' });
+  const [newOrder, setNewOrder] = useState({ date: '', items: '', qty: '', unitPrice: '', orderId: '', paymentType: '', paymentStatus: '', orderStatus: '', source: '' });
   const [errors, setErrors] = useState({});
 
-  // Mock handleCreateOrder - logs and closes (extend later)
-  const handleCreateOrder = () => {
-    console.log('Order created:', newOrder, 'for order:', selectedOrder);
+  const handleSaveOrder = (updatedOrderData) => {
+    if (modalMode === 'create') {
+      console.log('New order created:', updatedOrderData);
+      // Future: supabase insert
+    } else if (modalMode === 'edit' && selectedOrder) {
+      console.log('Order updated:', { ...selectedOrder, ...updatedOrderData });
+      // Future: supabase update
+    } else if (modalMode === 'view') {
+      console.log('View mode - no save');
+    }
     // Reset and close
-    setNewOrder({ date: '', items: '', qty: '', unitPrice: '' });
+    setNewOrder({ date: '', items: '', qty: '', unitPrice: '', orderId: '', paymentType: '', paymentStatus: '', orderStatus: '', source: '' });
     setErrors({});
     setShowCreateOrderModal(false);
     setSelectedOrder(null);
+    setModalMode('view');
+  };
+
+  const handleEditOrder = () => {
+    setModalMode('edit');
   };
 
   const handleNewOrderChange = (e) => {
     const { name, value } = e.target;
     setNewOrder(prev => ({ ...prev, [name]: value }));
     if (errors[name]) setErrors({});
+  };
+
+  const openNewOrder = () => {
+    setModalMode('create');
+    setSelectedOrder(null);
+    setShowCreateOrderModal(true);
+    setNewOrder({ date: '', items: '', qty: '', unitPrice: '', orderId: '', paymentType: '', paymentStatus: '', orderStatus: '', source: '' });
+  };
+
+  const handleRowClick = (order) => {
+    setSelectedOrder(order);
+    setModalMode('view');
+    setShowCreateOrderModal(true);
   };
 
   const calculateTotal = () => {
@@ -39,9 +65,10 @@ const Orders = () => {
 
   const closeCreateModal = () => {
     setShowCreateOrderModal(false);
-    setNewOrder({ date: '', items: '', qty: '', unitPrice: '' });
+    setNewOrder({ date: '', items: '', qty: '', unitPrice: '', orderId: '', paymentType: '', paymentStatus: '', orderStatus: '', source: '' });
     setErrors({});
     setSelectedOrder(null);
+    setModalMode('view');
   };
 
   const handleLogout = async () => {
@@ -49,44 +76,38 @@ const Orders = () => {
     navigate('/login');
   };
 
-  // Map order to customer-like prop for modal
-  const orderToCustomer = (order) => ({
-    id: order.id,
-    name: `${order.customerName} - Order ${order.displayId}`,
-    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(order.customerName)}&background=1e293b&color=f8fafc&size=128&bold=true`,
-    instagram: '@customer', // mock
-    phone: '+91 98765 43210', // mock
-    address: 'Order address mock', // mock
-    totalOrdersValue: order.value,
-    orders: [order] // self reference
-  });
 
-  const handleRowClick = (order) => {
-    setSelectedOrder(order);
-    setShowCreateOrderModal(true);
-  };
 
   return (
     <div className="relative min-h-screen bg-black text-white overflow-x-hidden">
       <Sidebar />
       <main className="ml-0 md:ml-64 p-8 md:p-12 flex flex-col min-h-screen">
-        <div className="flex-1 space-y-6">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-semibold text-white mb-4">
-              Orders
-            </h1>
-            <p className="text-slate-400">Manage and view your orders with customer details.</p>
-          </div>
+          <div className="flex-1 space-y-6">
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+              <div>
+                <h1 className="text-3xl md:text-4xl font-semibold text-white mb-4">
+                  Orders
+                </h1>
+                <p className="text-slate-400">Manage and view your orders with customer details.</p>
+              </div>
+              <button
+                onClick={openNewOrder}
+                className="px-8 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-all shadow-lg hover:shadow-emerald-500/25 whitespace-nowrap"
+              >
+                + New Order
+              </button>
+            </div>
 
-          <OrdersTable onRowClick={handleRowClick} />
+            <OrdersTable onRowClick={handleRowClick} />
 
-          {/* CreateOrderModal - reuse with order as customer */}
-          {showCreateOrderModal && selectedOrder && (
+          {showCreateOrderModal && (
             <CreateOrderModal
-              customer={orderToCustomer(selectedOrder)}
+              mode={modalMode}
+              order={selectedOrder}
+              customerName={selectedOrder?.customerName || ''}
               isOpen={showCreateOrderModal}
               onClose={closeCreateModal}
-              onCreateOrder={handleCreateOrder}
+              onSaveOrder={handleSaveOrder}
               newOrder={newOrder}
               setNewOrder={setNewOrder}
               errors={errors}

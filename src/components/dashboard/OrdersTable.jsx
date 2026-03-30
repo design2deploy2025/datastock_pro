@@ -8,7 +8,11 @@ const mockOrders = [
     productName: 'T-Shirt Premium Cotton x 3',
     value: '₹4,200',
     invoiceUrl: '#',
-    customerName: 'Sarah Johnson'
+    customerName: 'Sarah Johnson',
+    status: 'Delivered',
+    paymentStatus: 'Paid',
+    source: 'Instagram',
+    products: [{name: 'T-Shirt Premium Cotton', price: 1400, qty: 3, discount: 0}]
   },
   { 
     id: 2, 
@@ -17,7 +21,11 @@ const mockOrders = [
     productName: 'Hoodie Winter Fleece',
     value: '₹2,800',
     invoiceUrl: '#',
-    customerName: 'Lisa Wong'
+    customerName: 'Lisa Wong',
+    status: 'Shipped',
+    paymentStatus: 'Paid',
+    source: 'Website',
+    products: [{name: 'Hoodie Winter Fleece', price: 2800, qty: 1, discount: 0}]
   },
   { 
     id: 3, 
@@ -26,7 +34,11 @@ const mockOrders = [
     productName: 'Jeans Slim Fit x 2',
     value: '₹5,450',
     invoiceUrl: '#',
-    customerName: 'Emily Rodriguez'
+    customerName: 'Emily Rodriguez',
+    status: 'Processing',
+    paymentStatus: 'Pending',
+    source: 'Phone',
+    products: [{name: 'Jeans Slim Fit', price: 2725, qty: 2, discount: 0}]
   },
   { 
     id: 4, 
@@ -35,7 +47,11 @@ const mockOrders = [
     productName: 'Sneakers Air Max',
     value: '₹3,500',
     invoiceUrl: '#', 
-    customerName: 'Mike Chen'
+    customerName: 'Mike Chen',
+    status: 'Delivered',
+    paymentStatus: 'Paid',
+    source: 'Walk-in',
+    products: [{name: 'Sneakers Air Max', price: 3500, qty: 1, discount: 0}]
   },
   { 
     id: 5, 
@@ -44,7 +60,11 @@ const mockOrders = [
     productName: 'Dress Floral Maxi',
     value: '₹8,200',
     invoiceUrl: '#',
-    customerName: 'Rachel Kim'
+    customerName: 'Rachel Kim',
+    status: 'Cancelled',
+    paymentStatus: 'Refunded',
+    source: 'Instagram',
+    products: [{name: 'Dress Floral Maxi', price: 8200, qty: 1, discount: 0}]
   },
   { 
     id: 6, 
@@ -53,7 +73,11 @@ const mockOrders = [
     productName: 'Jacket Leather Bomber',
     value: '₹12,300',
     invoiceUrl: '#',
-    customerName: 'Lisa Wong'
+    customerName: 'Lisa Wong',
+    status: 'Shipped',
+    paymentStatus: 'Paid',
+    source: 'Website',
+    products: [{name: 'Jacket Leather Bomber', price: 12300, qty: 1, discount: 0}]
   },
   {
     id: 7, 
@@ -62,7 +86,11 @@ const mockOrders = [
     productName: 'Backpack Travel Pro',
     value: '₹5,600',
     invoiceUrl: '#',
-    customerName: 'Alex Turner'
+    customerName: 'Alex Turner',
+    status: 'Delivered',
+    paymentStatus: 'Paid',
+    source: 'Instagram',
+    products: [{name: 'Backpack Travel Pro', price: 5600, qty: 1, discount: 0}]
   }
 ];
 
