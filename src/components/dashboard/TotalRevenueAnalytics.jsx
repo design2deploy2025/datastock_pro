@@ -36,7 +36,7 @@ const AnalyticsCard = ({
       {/* Icon */}
       <div className="flex justify-center mb-6">
         <div className={iconClasses}>
-          <Icon className="h-12 w-12 drop-shadow-lg" />
+          <Icon className="h-8 w-8 drop-shadow-lg" />
         </div>
       </div>
 
@@ -47,7 +47,7 @@ const AnalyticsCard = ({
 
       {/* Value */}
       <div className="text-center mb-8">
-        <div className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent drop-shadow-2xl mb-2">
+        <div className="text-3xl font-black bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent drop-shadow-2xl mb-2">
           ${value.toLocaleString()}
         </div>
       </div>
@@ -151,14 +151,14 @@ const TotalRevenueAnalytics = () => {
     <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-12 gap-4">
-        <div>
-          <h2 className="text-4xl lg:text-5xl font-black bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent drop-shadow-2xl mb-2">
-            Total Revenue Analytics
-          </h2>
-          <p className="text-lg text-slate-400 max-w-md">
-            Monitor your revenue streams with real-time insights
-          </p>
-        </div>
+        
+
+        <div> 
+                <h1 className="text-3xl md:text-4xl font-semibold text-white mb-4">
+                  Total Revenue Analytics
+                </h1>
+                <p className="text-slate-400">Monitor your revenue streams with real-time insights</p>
+              </div>
       </div>
 
       {/* Cards Grid */}
@@ -172,8 +172,8 @@ const TotalRevenueAnalytics = () => {
           gradientId="gradient-teal"
           glowColor="34,197,94"
           Icon={CurrencyDollarIcon}
-          buttonClasses="w-12 h-12 rounded-2xl bg-gradient-to-r from-teal-500/20 to-teal-600/20 border border-teal-400/30 backdrop-blur-sm shadow-lg hover:shadow-xl hover:shadow-teal-500/30 flex items-center justify-center transition-all duration-300 text-teal-300"
-          iconClasses="p-4 bg-gradient-to-br from-teal-500/20 via-teal-400/10 to-teal-600/20 rounded-2xl border border-teal-500/30 shadow-lg backdrop-blur-md"
+          buttonClasses="w-8 h-8 rounded-2xl bg-gradient-to-r from-teal-500/20 to-teal-600/20 border border-teal-400/30 backdrop-blur-sm shadow-lg hover:shadow-xl hover:shadow-teal-500/30 flex items-center justify-center transition-all duration-300 text-teal-300"
+          iconClasses="p-2 bg-gradient-to-br from-teal-500/20 via-teal-400/10 to-teal-600/20 rounded-2xl border border-teal-500/30 shadow-lg backdrop-blur-md"
           glowOverlayClasses="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"
         />
         <AnalyticsCard
@@ -185,8 +185,8 @@ const TotalRevenueAnalytics = () => {
           gradientId="gradient-emerald"
           glowColor="16,185,129"
           Icon={ArrowTrendingUpIcon}
-          buttonClasses="w-12 h-12 rounded-2xl bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 border border-emerald-400/30 backdrop-blur-sm shadow-lg hover:shadow-xl hover:shadow-emerald-500/30 flex items-center justify-center transition-all duration-300 text-emerald-300"
-          iconClasses="p-4 bg-gradient-to-br from-emerald-500/20 via-emerald-400/10 to-emerald-600/20 rounded-2xl border border-emerald-500/30 shadow-lg backdrop-blur-md"
+          buttonClasses="w-8 h-8 rounded-2xl bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 border border-emerald-400/30 backdrop-blur-sm shadow-lg hover:shadow-xl hover:shadow-emerald-500/30 flex items-center justify-center transition-all duration-300 text-emerald-300"
+          iconClasses="p-2 bg-gradient-to-br from-emerald-500/20 via-emerald-400/10 to-emerald-600/20 rounded-2xl border border-emerald-500/30 shadow-lg backdrop-blur-md"
           glowOverlayClasses="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"
         />
         <AnalyticsCard
@@ -198,8 +198,8 @@ const TotalRevenueAnalytics = () => {
           gradientId="gradient-pink"
           glowColor="236,72,153"
           Icon={FunnelIcon}
-          buttonClasses="w-12 h-12 rounded-2xl bg-gradient-to-r from-pink-500/20 to-pink-600/20 border border-pink-400/30 backdrop-blur-sm shadow-lg hover:shadow-xl hover:shadow-pink-500/30 flex items-center justify-center transition-all duration-300 text-pink-300"
-          iconClasses="p-4 bg-gradient-to-br from-pink-500/20 via-pink-400/10 to-pink-600/20 rounded-2xl border border-pink-500/30 shadow-lg backdrop-blur-md"
+          buttonClasses="w-8 h-8 rounded-2xl bg-gradient-to-r from-pink-500/20 to-pink-600/20 border border-pink-400/30 backdrop-blur-sm shadow-lg hover:shadow-xl hover:shadow-pink-500/30 flex items-center justify-center transition-all duration-300 text-pink-300"
+          iconClasses="p-2 bg-gradient-to-br from-pink-500/20 via-pink-400/10 to-pink-600/20 rounded-2xl border border-pink-500/30 shadow-lg backdrop-blur-md"
           glowOverlayClasses="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"
         />
       </div>

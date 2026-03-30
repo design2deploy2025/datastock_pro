@@ -296,12 +296,12 @@ const Products = () => {
       <main className="ml-0 md:ml-64 p-8 md:p-12 flex flex-col min-h-screen">
         <div className="flex-1">
           <div className="mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent mb-4">
-              Products
-            </h1>
-            <p className="text-xl text-gray-400 mb-6 max-w-2xl">
-              Manage your products and inventory with ease. View details and stock status.
-            </p>
+            <div className='mb-8'> 
+                <h1 className="text-3xl md:text-4xl font-semibold text-white mb-4">
+                  Products
+                </h1>
+                <p className="text-slate-400">Manage your products and inventory with ease. View details and stock status.</p>
+              </div>
             {/* Filters Section - Matching OrdersTable/CustomersTable UI */}
             <div className="space-y-6 mb-12">
               {/* Search & Sort */}

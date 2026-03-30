@@ -36,7 +36,7 @@ const AnalyticsCard = ({
       {/* Icon */}
       <div className="flex justify-center mb-6">
         <div className={iconClasses}>
-          <Icon className="h-12 w-12 drop-shadow-lg" />
+          <Icon className="h-8 w-8 drop-shadow-lg" />
         </div>
       </div>
 
@@ -47,7 +47,7 @@ const AnalyticsCard = ({
 
       {/* Value */}
       <div className="text-center mb-8">
-        <div className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent drop-shadow-2xl mb-2">
+        <div className="text-3xl font-black bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent drop-shadow-2xl mb-2">
           {value.toLocaleString()}
         </div>
       </div>
@@ -151,14 +151,14 @@ const TotalSoldAnalytics = () => {
     <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-12 gap-4">
-        <div>
-          <h2 className="text-4xl lg:text-5xl font-black bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent drop-shadow-2xl mb-2">
-            Total Sold Analytics
-          </h2>
-          <p className="text-lg text-slate-400 max-w-md">
-            Track your sales performance with real-time insights
-          </p>
-        </div>
+        
+
+        <div> 
+                <h1 className="text-3xl md:text-4xl font-semibold text-white mb-4">
+                  Total Sold Analytics
+                </h1>
+                <p className="text-slate-400">Track your sales performance with real-time insights</p>
+              </div>
       </div>
 
       {/* Cards Grid */}
@@ -172,8 +172,8 @@ const TotalSoldAnalytics = () => {
           gradientId="gradient-blue"
           glowColor="59,130,246"
           Icon={ShoppingBagIcon}
-          buttonClasses="w-12 h-12 rounded-2xl bg-gradient-to-r from-blue-500/20 to-blue-600/20 border border-blue-400/30 backdrop-blur-sm shadow-lg hover:shadow-xl hover:shadow-blue-500/30 flex items-center justify-center transition-all duration-300 text-blue-300"
-          iconClasses="p-4 bg-gradient-to-br from-blue-500/20 via-blue-400/10 to-blue-600/20 rounded-2xl border border-blue-500/30 shadow-lg backdrop-blur-md"
+          buttonClasses="w-8 h-8 rounded-2xl bg-gradient-to-r from-blue-500/20 to-blue-600/20 border border-blue-400/30 backdrop-blur-sm shadow-lg hover:shadow-xl hover:shadow-blue-500/30 flex items-center justify-center transition-all duration-300 text-blue-300"
+          iconClasses="p-2 bg-gradient-to-br from-blue-500/20 via-blue-400/10 to-blue-600/20 rounded-2xl border border-blue-500/30 shadow-lg backdrop-blur-md"
           glowOverlayClasses="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"
         />
         <AnalyticsCard
@@ -185,8 +185,8 @@ const TotalSoldAnalytics = () => {
           gradientId="gradient-purple"
           glowColor="168,85,247"
           Icon={ArrowTrendingUpIcon}
-          buttonClasses="w-12 h-12 rounded-2xl bg-gradient-to-r from-purple-500/20 to-purple-600/20 border border-purple-400/30 backdrop-blur-sm shadow-lg hover:shadow-xl hover:shadow-purple-500/30 flex items-center justify-center transition-all duration-300 text-purple-300"
-          iconClasses="p-4 bg-gradient-to-br from-purple-500/20 via-purple-400/10 to-purple-600/20 rounded-2xl border border-purple-500/30 shadow-lg backdrop-blur-md"
+          buttonClasses="w-8 h-8 rounded-2xl bg-gradient-to-r from-purple-500/20 to-purple-600/20 border border-purple-400/30 backdrop-blur-sm shadow-lg hover:shadow-xl hover:shadow-purple-500/30 flex items-center justify-center transition-all duration-300 text-purple-300"
+          iconClasses="p-2 bg-gradient-to-br from-purple-500/20 via-purple-400/10 to-purple-600/20 rounded-2xl border border-purple-500/30 shadow-lg backdrop-blur-md"
           glowOverlayClasses="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"
         />
         <AnalyticsCard
@@ -198,8 +198,8 @@ const TotalSoldAnalytics = () => {
           gradientId="gradient-red"
           glowColor="239,68,68"
           Icon={ArrowTrendingUpIcon}
-          buttonClasses="w-12 h-12 rounded-2xl bg-gradient-to-r from-red-500/20 to-red-600/20 border border-red-400/30 backdrop-blur-sm shadow-lg hover:shadow-xl hover:shadow-red-500/30 flex items-center justify-center transition-all duration-300 text-red-300"
-          iconClasses="p-4 bg-gradient-to-br from-red-500/20 via-red-400/10 to-red-600/20 rounded-2xl border border-red-500/30 shadow-lg backdrop-blur-md"
+          buttonClasses="w-8 h-8 rounded-2xl bg-gradient-to-r from-red-500/20 to-red-600/20 border border-red-400/30 backdrop-blur-sm shadow-lg hover:shadow-xl hover:shadow-red-500/30 flex items-center justify-center transition-all duration-300 text-red-300"
+          iconClasses="p-2 bg-gradient-to-br from-red-500/20 via-red-400/10 to-red-600/20 rounded-2xl border border-red-500/30 shadow-lg backdrop-blur-md"
           glowOverlayClasses="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"
         />
       </div>
