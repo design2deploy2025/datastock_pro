@@ -14,13 +14,16 @@ const CreateProductModal = ({
     price: '',
     quantity: '',
     category: 'Electronics',
+    status: 'Active',
     desc: '',
     tags: ''
   });
+  const [customCategory, setCustomCategory] = useState('');
   const [errors, setErrors] = useState({});
   const [imagePreview, setImagePreview] = useState('/api/placeholder/400/250');
+  const [selectedImageFile, setSelectedImageFile] = useState(null);
 
-  const categories = ['Electronics', 'Home', 'Apparel', 'Stationery'];
+  const categories = ['Electronics', 'Clothing', 'Books', 'Furniture', 'Sports', 'Beauty', 'Other'];
 
   const handleImageChange = (url) => {
     setNewProduct(prev => ({ ...prev, img: url }));
@@ -31,11 +34,35 @@ const CreateProductModal = ({
     }
   };
 
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedImageFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target.result;
+        handleImageChange(dataUrl);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNewProduct(prev => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+    // Reset custom if changing away from Other
+    if (name === 'category' && value !== 'Other') {
+      setCustomCategory('');
+    }
+  };
+
+  const handleCustomCategoryChange = (e) => {
+    setCustomCategory(e.target.value);
+    if (errors.customCategory) {
+      setErrors(prev => ({ ...prev, customCategory: '' }));
     }
   };
 
@@ -45,8 +72,10 @@ const CreateProductModal = ({
     if (!newProduct.sku?.trim()) newErrors.sku = 'SKU is required';
     if (!newProduct.price || isNaN(newProduct.price) || parseFloat(newProduct.price) <= 0) newErrors.price = 'Valid price > 0 required';
     if (!newProduct.quantity || isNaN(newProduct.quantity) || parseInt(newProduct.quantity) < 0) newErrors.quantity = 'Valid stock >= 0 required';
-    if (!newProduct.img?.trim()) newErrors.img = 'Image URL required';
+    if (!newProduct.img?.trim()) newErrors.img = 'Image required (URL or file)';
     if (!newProduct.category) newErrors.category = 'Category required';
+    if (newProduct.category === 'Other' && !customCategory?.trim()) newErrors.customCategory = 'Custom category required';
+    if (!newProduct.status) newErrors.status = 'Status required';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -54,14 +83,20 @@ const CreateProductModal = ({
   const handleSave = () => {
     if (!validateForm()) return;
 
+    let finalCategory = newProduct.category;
+    if (newProduct.category === 'Other' && customCategory.trim()) {
+      finalCategory = customCategory.trim();
+    }
+
     const productData = {
       id: Date.now(),
-      img: newProduct.img,
+      img: selectedImageFile ? newProduct.img : newProduct.img, // dataURL if file
       name: newProduct.name.trim(),
       sku: newProduct.sku.trim(),
       price: `$${parseFloat(newProduct.price).toFixed(2)}`,
       quantity: parseInt(newProduct.quantity),
-      category: newProduct.category,
+      category: finalCategory,
+      status: newProduct.status,
       total_sold: 0,
       desc: newProduct.desc.trim(),
       tags: newProduct.tags.split(',').map(t => t.trim().toLowerCase()).filter(Boolean)
@@ -70,6 +105,7 @@ const CreateProductModal = ({
     onSaveProduct(productData);
     console.log('✅ New product created:', productData);
     alert('Product created successfully!');
+    onClose();
   };
 
   const getStockStatus = (qty) => {
@@ -81,6 +117,10 @@ const CreateProductModal = ({
   };
 
   const stockStatusColor = getStockStatus(newProduct.quantity);
+  const statusColorClass = newProduct.status === 'Active' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30' :
+                          newProduct.status === 'Draft' ? 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30' :
+                          newProduct.status === 'Out of Stock' ? 'bg-red-500/20 text-red-300 border-red-400/30' :
+                          'bg-slate-500/20 text-slate-300 border-slate-400/30';
 
   return (
     <>
@@ -89,7 +129,7 @@ const CreateProductModal = ({
         onClick={onClose}
       />
       <div className="fixed inset-0 flex items-center justify-center z-[60] p-4 md:p-8 animate-in slide-in-from-bottom-4 duration-300 fade-in-0">
-        <div className="bg-slate-900/95 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl w-full max-w-4xl h-[85vh] max-h-[95vh] flex flex-col overflow-hidden">
+        <div className="bg-slate-900/95 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl w-full max-w-4xl h-[90vh] max-h-[95vh] flex flex-col overflow-hidden">
           {/* Header */}
           <div className="p-6 lg:p-8 pb-4 border-b border-white/10 sticky top-0 bg-slate-900/95 backdrop-blur-sm z-10 flex-shrink-0">
             <div className="flex items-start lg:items-center justify-between gap-6">
@@ -208,10 +248,34 @@ const CreateProductModal = ({
                 />
                 {errors.quantity && <p className="text-red-400 text-sm mt-1">{errors.quantity}</p>}
               </div>
+
+              {/* Status */}
+              <div>
+                <label className="block text-sm font-semibold text-slate-300 mb-2 flex items-center gap-2">
+                  <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Status
+                </label>
+                <select
+                  name="status"
+                  value={newProduct.status}
+                  onChange={handleChange}
+                  className={`w-full bg-slate-900/80 backdrop-blur-sm border rounded-xl px-4 py-3 text-white font-semibold focus:outline-none focus:ring-2 transition-all ${
+                    errors.status ? 'border-red-400/50 ring-red-400/30' : 'border-white/10 focus:border-green-400/50 focus:ring-green-400/50'
+                  }`}
+                >
+                  <option value="Active">Active</option>
+                  <option value="Draft">Draft</option>
+                  <option value="Discontinued">Discontinued</option>
+                  <option value="Out of Stock">Out of Stock</option>
+                </select>
+                {errors.status && <p className="text-red-400 text-sm mt-1">{errors.status}</p>}
+              </div>
             </div>
 
             {/* Category */}
-            <div>
+            <div className="sm:col-span-2">
               <label className="block text-sm font-semibold text-slate-300 mb-2 flex items-center gap-2">
                 <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V9a4 4 0 014-4z" />
@@ -231,31 +295,58 @@ const CreateProductModal = ({
                 ))}
               </select>
               {errors.category && <p className="text-red-400 text-sm mt-1">{errors.category}</p>}
+              {newProduct.category === 'Other' && (
+                <div className="mt-3">
+                  <label className="block text-sm font-semibold text-slate-300 mb-2">
+                    Custom Category
+                  </label>
+                  <input
+                    type="text"
+                    name="customCategory"
+                    value={customCategory}
+                    onChange={handleCustomCategoryChange}
+                    className={`w-full bg-slate-900/80 backdrop-blur-sm border rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 transition-all ${
+                      errors.customCategory ? 'border-red-400/50 ring-red-400/30' : 'border-white/10 focus:border-purple-400/50 focus:ring-purple-400/50'
+                    }`}
+                    placeholder="Enter custom category..."
+                  />
+                  {errors.customCategory && <p className="text-red-400 text-sm mt-1">{errors.customCategory}</p>}
+                </div>
+              )}
             </div>
 
-            {/* Image URL */}
+            {/* Image Input */}
             <div className="sm:col-span-2">
               <label className="block text-sm font-semibold text-slate-300 mb-2 flex items-center gap-2">
                 <svg className="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                Image URL
+                Image (URL or Upload)
               </label>
-              <input
-                type="url"
-                name="img"
-                value={newProduct.img}
-                onChange={(e) => {
-                  handleChange(e);
-                  handleImageChange(e.target.value);
-                }}
-                className={`w-full bg-slate-900/80 backdrop-blur-sm border rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 transition-all ${
-                  errors.img ? 'border-red-400/50 ring-red-400/30' : 'border-white/10 focus:border-indigo-400/50 focus:ring-indigo-400/50'
-                }`}
-                placeholder="https://placehold.co/400x250/1a1a1a/white/Product?font=roboto"
-              />
+              <div className="space-y-3">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="w-full bg-slate-900/80 backdrop-blur-sm border border-dashed border-white/20 rounded-xl px-4 py-6 text-white focus:outline-none focus:ring-2 focus:border-indigo-400/50 focus:ring-indigo-400/50 transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-600/80 file:text-white file:cursor-pointer hover:file:bg-indigo-500"
+                />
+                <p className="text-xs text-slate-500 text-center">or</p>
+                <input
+                  type="url"
+                  name="img"
+                  value={newProduct.img}
+                  onChange={(e) => {
+                    handleChange(e);
+                    if (!selectedImageFile) handleImageChange(e.target.value);
+                  }}
+                  className={`w-full bg-slate-900/80 backdrop-blur-sm border rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 transition-all ${
+                    errors.img ? 'border-red-400/50 ring-red-400/30' : 'border-white/10 focus:border-indigo-400/50 focus:ring-indigo-400/50'
+                  }`}
+                  placeholder="https://placehold.co/400x250/1a1a1a/white/Product?font=roboto"
+                />
+              </div>
               {errors.img && <p className="text-red-400 text-sm mt-1">{errors.img}</p>}
-              <div className="mt-3 p-2 bg-slate-800/50 rounded-xl border border-white/10">
+              <div className="mt-4 p-2 bg-slate-800/50 rounded-xl border border-white/10">
                 <img 
                   src={imagePreview} 
                   alt="Preview"
@@ -264,6 +355,7 @@ const CreateProductModal = ({
                     e.target.src = '/api/placeholder/400/250';
                   }}
                 />
+                {selectedImageFile && <p className="text-xs text-emerald-400 mt-1 text-center font-medium">📁 Local file selected: {selectedImageFile.name}</p>}
               </div>
             </div>
 
@@ -289,7 +381,7 @@ const CreateProductModal = ({
             <div className="sm:col-span-2">
               <label className="block text-sm font-semibold text-slate-300 mb-2 flex items-center gap-2">
                 <svg className="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5.25A2.25 2.25 0 0114.25 5.5v.75a3 3 0 013 3 .75.75 0 00.75.75h.25A2.25 2.25 0 0120 13.5v3.75A2.25 2.25 0 0117.75 19h-9.5A2.25 2.25 0 016 16.75v-3.75A2.25 2.25 0 018.25 11h.75a3 3 0 013-3V5.5A2.25 2.25 0 0114.25 3H13z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5.25A2.25 2.25 0 0114.25 5.5v.75a3 3 0 013 .75 .75.75 0 00.75 .75h.25A2.25 2.25 0 0120 13.5v3.75A2.25 2.25 0 0117.75 19h-9.5A2.25 2.25 0 016 16.75v-3.75A2.25 2.25 0 018.25 11h.75a3 3 0 013-3V5.5A2.25 2.25 0 0114.25 3H13z" />
                 </svg>
                 Tags (comma separated)
               </label>
@@ -305,7 +397,7 @@ const CreateProductModal = ({
             </div>
 
             {/* Preview Stats */}
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 pt-4 border-t border-white/10">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-white/10">
               <div className="p-4 bg-slate-800/30 backdrop-blur-sm rounded-xl border border-white/10 text-center">
                 <p className="text-slate-400 text-xs uppercase tracking-wide">Price</p>
                 <p className="text-2xl font-bold text-emerald-400">${newProduct.price || '0.00'}</p>
@@ -323,7 +415,13 @@ const CreateProductModal = ({
               </div>
               <div className="p-4 bg-slate-800/30 backdrop-blur-sm rounded-xl border border-white/10 text-center">
                 <p className="text-slate-400 text-xs uppercase tracking-wide">Category</p>
-                <p className="text-xl font-bold text-purple-400">{newProduct.category}</p>
+                <p className="text-xl font-bold text-purple-400">{newProduct.category}{newProduct.category === 'Other' ? ` (${customCategory || ''})` : ''}</p>
+              </div>
+              <div className="p-4 bg-slate-800/30 backdrop-blur-sm rounded-xl border border-white/10 text-center">
+                <p className="text-slate-400 text-xs uppercase tracking-wide">Status</p>
+                <span className={`text-sm font-bold px-3 py-1 rounded-full ${statusColorClass}`}>
+                  {newProduct.status}
+                </span>
               </div>
             </div>
           </div>
@@ -342,7 +440,7 @@ const CreateProductModal = ({
               </button>
               <button 
                 onClick={handleSave}
-                disabled={!newProduct.name || !newProduct.sku || !newProduct.price || !newProduct.quantity || !newProduct.img}
+                disabled={!newProduct.name || !newProduct.sku || !newProduct.price || !newProduct.quantity || !newProduct.img || !newProduct.status || (newProduct.category === 'Other' && !customCategory)}
                 className="flex-1 px-6 py-4 bg-emerald-600/80 hover:bg-emerald-500 disabled:bg-emerald-700/50 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-all border border-emerald-400/30 flex items-center justify-center gap-2 shadow-lg hover:shadow-emerald-500/25"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -359,4 +457,3 @@ const CreateProductModal = ({
 };
 
 export default CreateProductModal;
-

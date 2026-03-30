@@ -24,6 +24,7 @@ const Products = () => {
       price: '$49.99',
       quantity: 25,
       category: 'Electronics',
+      status: 'Active',
       total_sold: 150,
       desc: 'Ergonomic wireless keyboard with multi-device connectivity and long battery life.',
       tags: ['new', 'popular', 'wireless']
@@ -36,6 +37,7 @@ const Products = () => {
       price: '$79.99',
       quantity: 12,
       category: 'Electronics',
+      status: 'Active',
       total_sold: 320,
       desc: 'High-performance gaming mouse with 12k DPI sensor and customizable RGB lighting.',
       tags: ['gaming', 'bestseller']
@@ -48,6 +50,7 @@ const Products = () => {
       price: '$12.99',
       quantity: 48,
       category: 'Home',
+      status: 'Active',
       total_sold: 89,
       desc: 'Premium ceramic mug with comfortable grip and dishwasher-safe design.',
       tags: ['home', 'gift']
@@ -60,6 +63,7 @@ const Products = () => {
       price: '$199.99',
       quantity: 8,
       category: 'Electronics',
+      status: 'Active',
       total_sold: 45,
       desc: 'Premium over-ear headphones with active noise cancellation and 30hr battery.',
       tags: ['premium', 'audio']
@@ -72,6 +76,7 @@ const Products = () => {
       price: '$24.99',
       quantity: 35,
       category: 'Apparel',
+      status: 'Active',
       total_sold: 210,
       desc: 'Soft 100% cotton t-shirt available in multiple sizes and colors.',
       tags: ['apparel', 'comfort']
@@ -84,6 +89,7 @@ const Products = () => {
       price: '$8.99',
       quantity: 62,
       category: 'Stationery',
+      status: 'Active',
       total_sold: 67,
       desc: 'A5 spiral-bound notebook with 100 ruled pages and durable cover.',
       tags: ['stationery', 'office']
@@ -96,6 +102,7 @@ const Products = () => {
       price: '$29.99',
       quantity: 18,
       category: 'Electronics',
+      status: 'Active',
       total_sold: 112,
       desc: 'High-speed USB 3.0 flash drive with metal casing for durability.',
       tags: ['storage', 'fast']
@@ -108,13 +115,24 @@ const Products = () => {
       price: '$34.99',
       quantity: 29,
       category: 'Home',
+      status: 'Active',
       total_sold: 95,
       desc: 'Insulated 500ml stainless steel bottle keeps drinks cold for 24hrs.',
       tags: ['eco-friendly', 'insulated']
     }
   ]);
 
-  const ProductCard = ({ img, name, sku, price, quantity, category, total_sold, desc, tags }) => (
+  const getStatusColor = (status) => {
+    switch(status) {
+      case 'Active': return 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30';
+      case 'Draft': return 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30';
+      case 'Out of Stock': return 'bg-red-500/20 text-red-300 border-red-400/30';
+      case 'Discontinued': return 'bg-slate-500/20 text-slate-300 border-slate-400/30';
+      default: return 'bg-slate-500/20 text-slate-300 border-slate-400/30';
+    }
+  };
+
+  const ProductCard = ({ img, name, sku, price, quantity, category, status, total_sold, desc, tags }) => (
     <div className="group bg-slate-900/80 border border-slate-800/50 rounded-2xl p-6 hover:bg-slate-900 hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-500/10 hover:scale-[1.02] transition-all duration-300 overflow-hidden">
       {/* Image */}
       <div className="mb-6">
@@ -127,9 +145,12 @@ const Products = () => {
       
       {/* Header: Name, SKU, Price */}
       <h3 className="text-xl md:text-2xl font-bold text-white mb-2 line-clamp-1 leading-tight">{name}</h3>
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-4">
         <span className="text-sm bg-slate-800/60 text-slate-400 px-3 py-1 rounded-lg font-mono border border-slate-700/50">
           SKU: {sku}
+        </span>
+        <span className={`text-sm font-bold px-3 py-1 rounded-full ${getStatusColor(status)}`}>
+          {status}
         </span>
         <span className="bg-gradient-to-r from-emerald-600 to-emerald-500 px-4 py-2 rounded-xl text-white font-bold text-lg shadow-md shadow-emerald-500/25 hover:shadow-emerald-400/40 hover:-translate-y-0.5 transition-all">
           {price}
@@ -141,7 +162,7 @@ const Products = () => {
         <div className="text-center">
           <div className="w-10 h-10 mx-auto mb-1 bg-emerald-500/20 rounded-lg flex items-center justify-center">
             <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-4L4 7m8 4v10M4 7v10l8 4" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
           </div>
           <div className="text-lg font-bold text-white">{quantity}</div>
