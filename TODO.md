@@ -1,8 +1,9 @@
-# TODO: Fix CreateOrderModal ReferenceError
+# Task Progress: Improve discount input in CreateOrderModal
 
-## Steps:
-- [x] 1. Create TODO.md with plan breakdown
-- [x] 2. Add missing useState declaration for showCreateCustomerModal in CreateOrderModal.jsx
-- [x] 3. Test the fix by running the dev server and checking Orders page
-- [x] 4. Mark complete and attempt_completion
+**Approved Plan:**
+- ✅ Step 1: User confirmed plan
+- ✅ Step 2: Create TODO.md
+- ✅ Step 3: Edit CreateOrderModal.jsx - replace discount input with labeled text input (no arrows), improved styling/validation
+- ✅ Step 4: Test changes in modal (changes implemented successfully, discount now has label "Discount", no arrows, improved styling with validation colors, % suffix positioned perfectly)
+- ✅ Step 5: Mark complete and attempt_completion
 

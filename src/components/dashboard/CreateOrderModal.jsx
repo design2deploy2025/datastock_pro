@@ -513,15 +513,23 @@ const CreateOrderModal = ({
                               )}
                             </div>
                             {!isView && (
-                              <div>
-                                <input
-                                  type="number"
-                                  min="0" max="100"
-                                  value={product.discount || 0}
-                                  onChange={(e) => updateDiscount(product.id, e.target.value)}
-                                  className="w-16 bg-slate-900/80 border border-yellow-400/50 rounded px-2 py-1 text-sm text-right"
-                                  placeholder="0"
-                                /> %
+<div className="flex items-center gap-1">
+                                <label className="text-xs font-medium text-slate-300 min-w-[60px]">Discount</label>
+                                <div className="relative flex-1 max-w-[100px]">
+                                  <input
+                                    type="text"
+                                    pattern="[0-9]*"
+                                    inputMode="decimal"
+                                    value={product.discount || ''}
+                                    onChange={(e) => updateDiscount(product.id, e.target.value)}
+                                    className="w-full bg-slate-900/90 backdrop-blur-sm border rounded-lg px-3 py-1.5 text-sm text-right font-mono focus:outline-none focus:ring-2 focus:ring-yellow-400/70 transition-all peer
+                                      border-yellow-400/50 hover:border-yellow-400/70
+                                      invalid:border-red-400/70 invalid:text-red-300
+                                      valid:border-emerald-400/70 valid:text-emerald-300"
+                                    placeholder="0"
+                                  />
+                                  <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-medium pointer-events-none">%</span>
+                                </div>
                               </div>
                             )}
                           </div>
