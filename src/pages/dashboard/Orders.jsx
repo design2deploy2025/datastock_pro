@@ -9,6 +9,39 @@ const Orders = () => {
   const { user, profile, logout } = useAuth();
   const navigate = useNavigate();
 
+  const onOrderUpdate = (updatedOrder) => {
+    setOrders(prev => prev.map(order => order.id === updatedOrder.id ? updatedOrder : order));
+    console.log('✅ Order updated inline:', updatedOrder);
+  };
+
+  const [orders, setOrders] = useState([
+    { 
+      id: 1, 
+      displayId: 'ORD-20241020-001',
+      date: '2024-10-20',
+      productName: 'T-Shirt Premium Cotton x 3',
+      value: '₹4,200',
+      invoiceUrl: '#',
+      customerName: 'Sarah Johnson',
+      status: 'Delivered',
+      paymentStatus: 'Paid',
+      source: 'Instagram',
+      products: [{name: 'T-Shirt Premium Cotton', price: 1400, qty: 3}]
+    },
+    { 
+      id: 2, 
+      displayId: 'ORD-20241019-002', 
+      date: '2024-10-19',
+      productName: 'Hoodie Winter Fleece',
+      value: '₹2,800',
+      invoiceUrl: '#',
+      customerName: 'Lisa Wong',
+      status: 'Shipped',
+      paymentStatus: 'Paid',
+      source: 'Website',
+      products: [{name: 'Hoodie Winter Fleece', price: 2800, qty: 1}]
+    }
+  ]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalMode, setModalMode] = useState('view'); // 'view' | 'edit' | 'create'
   const [showCreateOrderModal, setShowCreateOrderModal] = useState(false);
@@ -17,13 +50,13 @@ const Orders = () => {
 
   const handleSaveOrder = (updatedOrderData) => {
     if (modalMode === 'create') {
-      console.log('New order created:', updatedOrderData);
-      // Future: supabase insert
+      // Add new order to state (persist frontend)
+      setOrders(prev => [updatedOrderData, ...prev]);
+      console.log('✅ New order created & persisted:', updatedOrderData);
     } else if (modalMode === 'edit' && selectedOrder) {
-      console.log('Order updated:', { ...selectedOrder, ...updatedOrderData });
-      // Future: supabase update
-    } else if (modalMode === 'view') {
-      console.log('View mode - no save');
+      setOrders(prev => prev.map(order => order.id === selectedOrder.id ? { ...order, ...updatedOrderData } : order));
+      setSelectedOrder(updatedOrderData);
+      console.log('✅ Order updated:', updatedOrderData);
     }
     // Reset and close
     setNewOrder({ date: '', items: '', qty: '', unitPrice: '', orderId: '', paymentType: '', paymentStatus: '', orderStatus: '', source: '' });
@@ -98,7 +131,7 @@ const Orders = () => {
               </button>
             </div>
 
-            <OrdersTable onRowClick={handleRowClick} />
+            <OrdersTable data={orders} onRowClick={handleRowClick} onOrderUpdate={onOrderUpdate} />
 
           {showCreateOrderModal && (
             <CreateOrderModal
@@ -110,8 +143,6 @@ const Orders = () => {
               onSaveOrder={handleSaveOrder}
               newOrder={newOrder}
               setNewOrder={setNewOrder}
-              errors={errors}
-              calculateTotal={calculateTotal}
               handleNewOrderChange={handleNewOrderChange}
             />
           )}

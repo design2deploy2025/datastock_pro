@@ -53,6 +53,21 @@ const CreateOrderModal = ({
   const [productSearch, setProductSearch] = useState('');
   const [customerSearch, setCustomerSearch] = useState('');
 
+  // Sync local state to parent props
+  React.useEffect(() => {
+    if (propSetNewOrder && propHandleNewOrderChange) {
+      const syncField = (name, value) => {
+        propHandleNewOrderChange({ target: { name, value } });
+      };
+      syncField('orderId', orderId);
+      syncField('date', orderDate);
+      syncField('status', orderStatus);
+      syncField('paymentStatus', paymentStatus);
+      syncField('source', source);
+      syncField('items', JSON.stringify(selectedProducts));
+    }
+  }, [orderId, orderDate, orderStatus, paymentStatus, source, selectedProducts, propSetNewOrder, propHandleNewOrderChange]);
+
   const filteredProducts = mockProducts.filter(p => 
     p.name.toLowerCase().includes(productSearch.toLowerCase())
   );
@@ -89,6 +104,7 @@ const CreateOrderModal = ({
 
   const handleSave = () => {
     const orderData = {
+      id: Date.now(),
       customerName: customer?.name || '',
       displayId: orderId,
       date: orderDate,
@@ -96,16 +112,16 @@ const CreateOrderModal = ({
       paymentStatus,
       source,
       products: selectedProducts,
+      productName: selectedProducts.map(p => `${p.name} x ${p.qty}`).join(', ') || 'Multiple',
       value: `₹${totalValue.toLocaleString('en-IN')}`,
       itemsCount,
-      avgPrice
+      avgPrice,
+      invoiceUrl: '#'
     };
     onSaveOrder?.(orderData);
-    // Update prop state if provided
-    if (propSetNewOrder && propHandleNewOrderChange) {
-      propHandleNewOrderChange({ target: { name: 'items', value: JSON.stringify(selectedProducts) } });
-      // etc for other fields
-    }
+    // Show success
+    console.log('✅ Order saved:', orderData);
+    alert(`Order ${orderId || 'New'} saved successfully! Total: ₹${totalValue.toLocaleString('en-IN')}`);
   };
 
   const getCustomerAvatar = (name) => {

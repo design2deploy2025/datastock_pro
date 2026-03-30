@@ -1,13 +1,17 @@
-# Create Order Modal Implementation Plan
+# Inline Order Editing Implementation
 
-## Overview
-Recreate `src/components/dashboard/CreateOrderModal.jsx` from scratch with **exact UI/layout** of customer detail modal from `Customers.jsx`.
+## Plan Summary
+- Add inline editing to OrdersTable for status, paymentStatus, source (dropdowns).
+- Single-row edit mode via pencil icon.
+- Update local state via callback.
+- UI-only, no modal edit.
 
 ## Steps
-- [ ] **Step 1:** Create new CreateOrderModal.jsx matching customer modal structure (header, 4-col cards, products section, stats, footer).
-- [ ] **Step 2:** Test modal opening from Orders.jsx "New Order" button.
-- [ ] **Step 3:** Test modal from Customers.jsx (customer row → Create Order).
-- [ ] **Step 4:** Verify form submission, calculations, responsive layout.
-- [ ] **Step 5:** Complete - attempt_completion.
+- [x] 1. Update src/pages/dashboard/Orders.jsx: Add onOrderUpdate callback, pass to OrdersTable.
+- [x] 2. Update src/components/dashboard/OrdersTable.jsx: Add Status, Payment, Source columns; editingRowId state; edit icon; inline inputs/dropdowns; save/cancel logic calling onOrderUpdate.
+**Next: Step 3 - Test functionality.**
+- [ ] 3. Test: Click edit, change fields, save → table updates.
+- [ ] 4. Optional: Remove unused modal edit code if desired.
+- [ ] 5. Complete task.
 
-**Current Progress:** Starting Step 1
+**Next: Implement step 1.**
