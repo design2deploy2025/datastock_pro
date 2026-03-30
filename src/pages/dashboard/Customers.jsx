@@ -3,6 +3,7 @@ import Sidebar from '../../components/sidebar/Sidebar';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import CreateOrderModal from '../../components/dashboard/CreateOrderModal';
+import CreateCustomerModal from '../../components/dashboard/CreateCustomerModal';
 import CustomersTable from '../../components/dashboard/CustomersTable';
 
 const customers = [
@@ -109,6 +110,16 @@ const customers = [
 const Customers = () => {
   const [selectedCustomer, setSelectedCustomer] = React.useState(null);
   const [showCreateOrderModal, setShowCreateOrderModal] = React.useState(false);
+  const [showCreateCustomerModal, setShowCreateCustomerModal] = React.useState(false);
+
+  const openCreateCustomerModal = React.useCallback(() => {
+    setShowCreateCustomerModal(true);
+    setSelectedCustomer(null); // Close detail modal if open
+  }, []);
+
+  const closeCreateCustomerModal = React.useCallback(() => {
+    setShowCreateCustomerModal(false);
+  }, []);
   const [isEditing, setIsEditing] = React.useState(false);
   const [editCustomer, setEditCustomer] = React.useState({});
 
@@ -251,11 +262,19 @@ const Customers = () => {
       <Sidebar />
       <main className="ml-0 md:ml-64 p-8 md:p-12 flex flex-col min-h-screen">
         <div className="flex-1 space-y-6">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-semibold text-white mb-4">
-              Customers
-            </h1>
-            <p className="text-slate-400">Manage and view your customer list.</p>
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-semibold text-white mb-4">
+                Customers
+              </h1>
+              <p className="text-slate-400">Manage and view your customer list.</p>
+            </div>
+            <button
+              onClick={openCreateCustomerModal}
+              className="px-8 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-all shadow-lg hover:shadow-emerald-500/25 whitespace-nowrap"
+            >
+              + Add Customer
+            </button>
           </div>
 
           <CustomersTable data={customersList} onRowClick={setSelectedCustomer} />
@@ -514,8 +533,18 @@ const Customers = () => {
             calculateTotal={calculateTotal}
             handleNewOrderChange={handleNewOrderChange}
           />
-        </>
+        </> // Close detail modal conditional
       )}
+      
+      {/* Create Customer Modal - RENDERED OUTSIDE detail modal, always on top */}
+      <CreateCustomerModal
+        isOpen={showCreateCustomerModal}
+        onClose={closeCreateCustomerModal}
+        onSaveCustomer={(customerData) => {
+          setCustomersList(prev => [customerData, ...prev]);
+          closeCreateCustomerModal();
+        }}
+      />
     </div>
   );
 };

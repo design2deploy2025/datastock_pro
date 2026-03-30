@@ -1,17 +1,14 @@
-# Inline Order Editing Implementation
+# TODO: Fix Create Customer Button Bug
 
-## Plan Summary
-- Add inline editing to OrdersTable for status, paymentStatus, source (dropdowns).
-- Single-row edit mode via pencil icon.
-- Update local state via callback.
-- UI-only, no modal edit.
+## Plan Progress
+✅ Step 1: Analyzed files (Customers.jsx, CustomersTable.jsx, CreateCustomerModal.jsx)  
+✅ Step 2: Created detailed edit plan and got user approval  
+🔄 **Step 3: Implement fixes in Customers.jsx**  
+- Add explicit useCallback handler  
+- Fix modal rendering order/z-index  
+- Ensure state isolation  
 
-## Steps
-- [x] 1. Update src/pages/dashboard/Orders.jsx: Add onOrderUpdate callback, pass to OrdersTable.
-- [x] 2. Update src/components/dashboard/OrdersTable.jsx: Add Status, Payment, Source columns; editingRowId state; edit icon; inline inputs/dropdowns; save/cancel logic calling onOrderUpdate.
-**Next: Step 3 - Test functionality.**
-- [ ] 3. Test: Click edit, change fields, save → table updates.
-- [ ] 4. Optional: Remove unused modal edit code if desired.
-- [ ] 5. Complete task.
-
-**Next: Implement step 1.**
+⏳ Step 4: Update CreateCustomerModal.jsx (z-index fix)  
+⏳ Step 5: Test button functionality  
+⏳ Step 6: Verify table row opens ONLY detail modal  
+✅ Step 7: Complete task & cleanup TODO
