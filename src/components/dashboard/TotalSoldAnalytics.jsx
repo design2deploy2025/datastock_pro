@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+
 import {
   LineChart,
   Line,
@@ -7,25 +8,31 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-} from 'recharts';
+} from "recharts";
 import {
   ShoppingBagIcon,
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
   FunnelIcon,
-} from '@heroicons/react/24/outline';
+} from "@heroicons/react/24/outline";
+import CustomTooltip from "./CustomTooltip";
 
 // Reusable Analytics Card Component (with hardcoded accent classes)
-const AnalyticsCard = ({ title, value, delta, deltaType, trendData, gradientId, glowColor, Icon, buttonClasses, iconClasses, glowOverlayClasses }) => {
+const AnalyticsCard = ({
+  title,
+  value,
+  delta,
+  deltaType,
+  trendData,
+  gradientId,
+  glowColor,
+  Icon,
+  buttonClasses,
+  iconClasses,
+  glowOverlayClasses,
+}) => {
   return (
-    <div className="group relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] overflow-hidden hover:shadow-[0_0_35px_rgba(var(--glow-color),0.6)]">
-      {/* Top-right circular button */}
-      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <button className={buttonClasses}>
-          <FunnelIcon className="h-6 w-6" />
-        </button>
-      </div>
-
+    <div className="group relative overflow-visible bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_0_35px_rgba(var(--glow-color),0.6)]">
       {/* Icon */}
       <div className="flex justify-center mb-6">
         <div className={iconClasses}>
@@ -46,8 +53,10 @@ const AnalyticsCard = ({ title, value, delta, deltaType, trendData, gradientId, 
       </div>
 
       {/* Delta */}
-      <div className={`flex items-center justify-center text-sm font-semibold gap-1 mb-8 ${deltaType === 'up' ? 'text-emerald-400' : 'text-red-400'}`}>
-        {deltaType === 'up' ? (
+      <div
+        className={`flex items-center justify-center text-sm font-semibold gap-1 mb-8 ${deltaType === "up" ? "text-emerald-400" : "text-red-400"}`}
+      >
+        {deltaType === "up" ? (
           <ArrowTrendingUpIcon className="h-5 w-5" />
         ) : (
           <ArrowTrendingDownIcon className="h-5 w-5" />
@@ -58,7 +67,10 @@ const AnalyticsCard = ({ title, value, delta, deltaType, trendData, gradientId, 
       {/* Mini Line Graph */}
       <div className="h-32 md:h-40">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={trendData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
+          <LineChart
+            data={trendData}
+            margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
+          >
             <defs>
               <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
                 <stop offset="0%" stopColor={`rgba(${glowColor}, 0.8)`} />
@@ -66,34 +78,39 @@ const AnalyticsCard = ({ title, value, delta, deltaType, trendData, gradientId, 
                 <stop offset="100%" stopColor={`rgba(${glowColor}, 0.1)`} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 10 }} tickMargin={10} />
-            <YAxis hide />
-            <Tooltip 
-              contentStyle={{
-                background: 'rgba(0,0,0,0.9)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '12px',
-                backdropFilter: 'blur(20px)',
-              }}
-              labelStyle={{ color: '#fff' }}
-              itemStyle={{ color: '#fff' }}
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="rgba(255,255,255,0.05)"
+              vertical={false}
             />
-            <Line 
-              type="monotone" 
-              dataKey="value" 
-              stroke={`url(#${gradientId})`} 
+            <XAxis
+              dataKey="name"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 10 }}
+              tickMargin={10}
+            />
+            <YAxis hide />
+            <Tooltip
+              content={<CustomTooltip />}
+              wrapperStyle={{ zIndex: 9999, pointerEvents: "none" }}
+              position={{ y: 0 }}
+            />
+            <Line
+              type="monotone"
+              dataKey="value"
+              stroke={`url(#${gradientId})`}
               strokeWidth={3}
               dot={{
                 fill: `rgba(${glowColor}, 0.8)`,
                 strokeWidth: 2,
-                stroke: '#fff',
-                r: 4
+                stroke: "#fff",
+                r: 4,
               }}
               activeDot={{
                 r: 6,
                 strokeWidth: 3,
-                stroke: '#fff',
+                stroke: "#fff",
               }}
             />
           </LineChart>
@@ -107,20 +124,27 @@ const AnalyticsCard = ({ title, value, delta, deltaType, trendData, gradientId, 
 };
 
 const TotalSoldAnalytics = () => {
-  const [timeRange, setTimeRange] = useState('Lifetime');
-
   // Dummy trend data
   const lifetimeData = [
-    { name: 'Jan', value: 850 }, { name: 'Feb', value: 920 }, { name: 'Mar', value: 950 },
-    { name: 'Apr', value: 980 }, { name: 'May', value: 1020 }, { name: 'Jun', value: 1088 },
+    { name: "Jan", value: 850 },
+    { name: "Feb", value: 920 },
+    { name: "Mar", value: 950 },
+    { name: "Apr", value: 980 },
+    { name: "May", value: 1020 },
+    { name: "Jun", value: 1088 },
   ];
   const todayData = [
-    { name: '9AM', value: 12 }, { name: '12PM', value: 28 }, { name: '3PM', value: 35 },
-    { name: '6PM', value: 42 }, { name: '9PM', value: 45 },
+    { name: "9AM", value: 12 },
+    { name: "12PM", value: 28 },
+    { name: "3PM", value: 35 },
+    { name: "6PM", value: 42 },
+    { name: "9PM", value: 45 },
   ];
   const monthlyData = [
-    { name: 'W1', value: 45 }, { name: 'W2', value: 78 }, { name: 'W3', value: 210 },
-    { name: 'W4', value: 256 },
+    { name: "W1", value: 45 },
+    { name: "W2", value: 78 },
+    { name: "W3", value: 210 },
+    { name: "W4", value: 256 },
   ];
 
   return (
@@ -134,30 +158,6 @@ const TotalSoldAnalytics = () => {
           <p className="text-lg text-slate-400 max-w-md">
             Track your sales performance with real-time insights
           </p>
-        </div>
-        <div className="flex flex-wrap gap-3 items-center">
-          {/* Time Range Dropdown */}
-          <div className="relative">
-            <select
-              value={timeRange}
-              onChange={(e) => setTimeRange(e.target.value)}
-              className="appearance-none bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-6 py-3 text-white font-medium shadow-xl hover:shadow-2xl hover:shadow-blue-500/30 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500/50 min-w-[160px]"
-            >
-              <option value="24H">24H</option>
-              <option value="Monthly">Monthly</option>
-              <option value="Lifetime">Lifetime</option>
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
-          </div>
-          {/* Filter Pill */}
-          <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-md border border-blue-500/30 rounded-2xl px-6 py-3 flex items-center gap-2 shadow-lg hover:shadow-xl hover:shadow-blue-400/40 transition-all duration-300 cursor-pointer">
-            <FunnelIcon className="h-5 w-5 text-blue-400" />
-            <span className="font-medium text-white">Sales Data</span>
-          </div>
         </div>
       </div>
 
@@ -208,4 +208,3 @@ const TotalSoldAnalytics = () => {
 };
 
 export default TotalSoldAnalytics;
-
