@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const CreateProductModal = ({ 
   isOpen, 
   onClose, 
-  onSaveProduct 
+  onSaveProduct, 
+  editingProduct,
+  onUpdateProduct 
 }) => {
   if (!isOpen) return null;
 
@@ -22,6 +24,28 @@ const CreateProductModal = ({
   const [errors, setErrors] = useState({});
   const [imagePreview, setImagePreview] = useState('/api/placeholder/400/250');
   const [selectedImageFile, setSelectedImageFile] = useState(null);
+
+  useEffect(() => {
+    if (editingProduct) {
+      setNewProduct({
+        img: editingProduct.img,
+        name: editingProduct.name,
+        sku: editingProduct.sku,
+        price: editingProduct.price.replace('$', ''),
+        quantity: editingProduct.quantity.toString(),
+        category: editingProduct.category,
+        status: editingProduct.status,
+        desc: editingProduct.desc,
+        tags: editingProduct.tags.join(', ')
+      });
+      handleImageChange(editingProduct.img);
+      if (editingProduct.category === 'Other') {
+        setCustomCategory(editingProduct.category);
+      }
+      setSelectedImageFile(null);
+      setErrors({});
+    }
+  }, [editingProduct]);
 
   const categories = ['Electronics', 'Clothing', 'Books', 'Furniture', 'Sports', 'Beauty', 'Other'];
 
@@ -80,33 +104,31 @@ const CreateProductModal = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSave = () => {
-    if (!validateForm()) return;
+    const handleSave = () => {
+      if (!validateForm()) return;
 
-    let finalCategory = newProduct.category;
-    if (newProduct.category === 'Other' && customCategory.trim()) {
-      finalCategory = customCategory.trim();
-    }
+      let finalCategory = newProduct.category;
+      if (newProduct.category === 'Other' && customCategory.trim()) {
+        finalCategory = customCategory.trim();
+      }
 
-    const productData = {
-      id: Date.now(),
-      img: selectedImageFile ? newProduct.img : newProduct.img, // dataURL if file
-      name: newProduct.name.trim(),
-      sku: newProduct.sku.trim(),
-      price: `$${parseFloat(newProduct.price).toFixed(2)}`,
-      quantity: parseInt(newProduct.quantity),
-      category: finalCategory,
-      status: newProduct.status,
-      total_sold: 0,
-      desc: newProduct.desc.trim(),
-      tags: newProduct.tags.split(',').map(t => t.trim().toLowerCase()).filter(Boolean)
+      const productData = {
+        ...(editingProduct && { id: editingProduct.id, total_sold: editingProduct.total_sold }),
+        img: selectedImageFile ? newProduct.img : newProduct.img,
+        name: newProduct.name.trim(),
+        sku: newProduct.sku.trim(),
+        price: `$${parseFloat(newProduct.price).toFixed(2)}`,
+        quantity: parseInt(newProduct.quantity),
+        category: finalCategory,
+        status: newProduct.status,
+        desc: newProduct.desc.trim(),
+        tags: newProduct.tags.split(',').map(t => t.trim().toLowerCase()).filter(Boolean)
+      };
+
+      // Unified callback - parent handles create vs update
+      onSaveProduct(productData);
+      onClose();
     };
-
-    onSaveProduct(productData);
-    console.log('✅ New product created:', productData);
-    alert('Product created successfully!');
-    onClose();
-  };
 
   const getStockStatus = (qty) => {
     const num = parseInt(qty);
@@ -144,10 +166,10 @@ const CreateProductModal = ({
                 />
                 <div>
                   <h2 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent leading-tight">
-                    New Product
+                    {editingProduct ? `Edit ${editingProduct.name}` : 'New Product'}
                   </h2>
                   <p className="text-sm lg:text-base text-slate-400 mt-1 font-medium">
-                    Fill all fields to create a new product listing
+                    {editingProduct ? `Update product details for "${editingProduct.name}"` : 'Fill all fields to create a new product listing'}
                   </p>
                 </div>
               </div>
@@ -446,7 +468,7 @@ const CreateProductModal = ({
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                Create Product
+                {editingProduct ? 'Update Product' : 'Create Product'}
               </button>
             </div>
           </div>

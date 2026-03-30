@@ -8,10 +8,24 @@ const Products = () => {
   const { user, profile, logout } = useAuth();
   const navigate = useNavigate();
   const [showProductModal, setShowProductModal] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
 
   const handleLogout = async () => {
     await logout();
     navigate('/login');
+  };
+
+  const handleEdit = (product) => {
+    setEditingProduct(product);
+    setShowProductModal(true);
+  };
+
+  const handleUpdateProduct = (updatedProduct) => {
+    setProducts(prev => prev.map(p => p.id === updatedProduct.id ? { ...updatedProduct } : p));
+    setEditingProduct(null);
+    setShowProductModal(false);
+    alert(`✅ Product "${updatedProduct.name}" updated successfully!`);
+    console.log('Product updated:', updatedProduct);
   };
 
   // Dummy products data - UI only
@@ -132,7 +146,7 @@ const Products = () => {
     }
   };
 
-  const ProductCard = ({ img, name, sku, price, quantity, category, status, total_sold, desc, tags }) => (
+  const ProductCard = ({ id, img, name, sku, price, quantity, category, status, total_sold, desc, tags }) => (
     <div className="group bg-slate-900/80 border border-slate-800/50 rounded-2xl p-6 hover:bg-slate-900 hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-500/10 hover:scale-[1.02] transition-all duration-300 overflow-hidden">
       {/* Image */}
       <div className="mb-6">
@@ -200,6 +214,16 @@ const Products = () => {
           </span>
         ))}
       </div>
+
+      {/* Edit Button */}
+      <button
+        onClick={() => handleEdit({ id, img, name, sku, price, quantity, category, status, total_sold, desc, tags })}
+        className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-xl transition-all group/edit hover:scale-110 shadow-lg hover:shadow-white/20 opacity-0 group-hover:opacity-100"
+      >
+        <svg className="w-5 h-5 text-white/90 group-hover/edit:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.5h3m1 1v-2a2 2 0 00-2-2H7a2 2 0 00-2 2v2" />
+        </svg>
+      </button>
     </div>
   );
 
@@ -232,13 +256,26 @@ const Products = () => {
             {showProductModal && (
               <CreateProductModal 
                 isOpen={showProductModal}
-                onClose={() => setShowProductModal(false)}
-                onSaveProduct={(newProduct) => {
-                  setProducts(prev => [newProduct, ...prev]);
+                onClose={() => {
                   setShowProductModal(false);
-                  alert(`✅ Product "${newProduct.name}" added successfully!`);
-                  console.log('New product added:', newProduct);
+                  setEditingProduct(null);
                 }}
+                editingProduct={editingProduct}
+                onSaveProduct={(productData) => {
+                  if (editingProduct?.id || productData.id) {
+                    // Update existing product
+                    setProducts(prev => prev.map(p => p.id === productData.id ? { ...productData } : p));
+                    alert(`✅ Product "${productData.name}" updated successfully!`);
+                    console.log('Product updated:', productData);
+                  } else {
+                    // Create new product
+                    setProducts(prev => [productData, ...prev]);
+                    alert(`✅ Product "${productData.name}" added successfully!`);
+                  }
+                  setEditingProduct(null);
+                  setShowProductModal(false);
+                }}
+                onUpdateProduct={handleUpdateProduct}
               />
             )}
           </div>

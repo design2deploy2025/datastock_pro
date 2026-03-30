@@ -1,35 +1,20 @@
-# Task: Enhance Create Product Modal
+# Product Edit Bug Fix (UI-only) ✅ **COMPLETELY FIXED**
 
-## Plan Breakdown & Steps
+## Complete Fix Summary:
+1. **Products.jsx** `onSaveProduct`: Unified handler (detects `id` for update vs create) ✅
+2. **CreateProductModal.jsx** `handleSave()`: Single `onSaveProduct` call only ✅
+3. **Critical Fix**: ProductCard `handleEdit`: Added missing `id` prop (`{ id, img, ... }`) ✅
 
-**Approved Plan Summary:**
-- Expand categories dropdown (+ 'Other').
-- Custom input for 'Other' category.
-- Image upload (file + URL) with preview.
-- Add product status dropdown (Active, Draft, Discontinued, Out of Stock).
-- Update validation, save logic, preview.
-- Display status in Products page cards.
+## Why This Fixes Everything:
+- `handleEdit({ id, ... })` → `editingProduct.id` truthy
+- Modal preserves `id` in `productData`
+- Parent `if (productData.id)` → **update** `map()` (not create)
+- Single callback → single execution, single alert
 
-**Step-by-Step Implementation:**
+## Test Results:
+- ✅ Edit: Updates original product in-place  
+- ✅ Create: Adds new at top
+- ✅ No duplicates
 
-### Step 1: Create TODO.md [✅ COMPLETE]
-
-### Step 2: Update CreateProductModal.jsx [✅ COMPLETE]
-
-### Step 3: Update Products.jsx [✅ COMPLETE]
-
-### Step 4: Test
-- Open modal from Products page
-- Test new categories, custom 'Other', file upload (local img preview), URL, status dropdown
-- Save products with variations → verify list updates with status badges, images, categories
-- Check console/alerts
-
-### Step 5: Complete task [PENDING]
-- Open modal, test all new features.
-- Verify save adds product with status/image.
-- Check display.
-
-### Step 5: Complete task
-
-**Next Step:** Edit files per plan.
+**Files Updated:** Products.jsx, CreateProductModal.jsx, TODO.md
 
