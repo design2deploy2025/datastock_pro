@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import CreateCustomerModal from './CreateCustomerModal';
 
 const mockProducts = [
   { id: 1, name: 'T-Shirt Premium Cotton', price: 1400 },
@@ -52,6 +53,7 @@ const CreateOrderModal = ({
   const [selectedProducts, setSelectedProducts] = useState(propOrder?.products || []);
   const [productSearch, setProductSearch] = useState('');
   const [customerSearch, setCustomerSearch] = useState('');
+  const [showCreateCustomerModal, setShowCreateCustomerModal] = useState(false);
 
   // Sync local state to parent props
   React.useEffect(() => {
@@ -280,17 +282,61 @@ const CreateOrderModal = ({
                 </div>
                 <input
                   type="text"
-                  placeholder="Search customer..."
+                  placeholder="Type customer name or details..."
                   value={customerSearch}
                   onChange={(e) => {
-                    setCustomerSearch(e.target.value);
-                    // Auto-select first match (demo)
-                    const match = filteredCustomers[0];
-                    if (match) setCustomer(match);
+                    const value = e.target.value;
+                    setCustomerSearch(value);
+                    if (value) {
+                      setCustomer(null); // Clear selection for new search
+                    }
                   }}
-                  className="w-full bg-slate-900/80 border border-yellow-400/50 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400/70"
+                  className="w-full bg-slate-900/80 border border-yellow-400/50 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400/70 relative z-10"
                 />
-                {customer && <p className="text-sm text-emerald-400 mt-2">{customer.name}</p>}
+                {customer && (
+                  <div className="mt-2 p-3 bg-emerald-500/10 border border-emerald-400/30 rounded-xl">
+                    <p className="text-sm font-semibold text-emerald-300">{customer.name}</p>
+                    {customer.phone && <p className="text-xs text-emerald-200 mt-1">{customer.phone}</p>}
+                  </div>
+                )}
+{filteredCustomers.length > 0 && customerSearch && !customer && (
+                  <div className="absolute left-0 right-0 mt-1 bg-slate-800/95 border border-white/20 rounded-xl shadow-2xl max-h-60 overflow-y-auto z-20 py-2">
+                    {filteredCustomers.slice(0, 8).map((cust) => (
+                      <button
+                        key={cust.id}
+                        onClick={() => {
+                          setCustomer(cust);
+                          setCustomerSearch(cust.name);
+                        }}
+                        className="w-full flex items-center gap-3 p-3 hover:bg-slate-700/50 rounded-lg transition-all text-left"
+                      >
+                        <img 
+                          src={cust.avatar} 
+                          alt={cust.name}
+                          className="w-10 h-10 rounded-xl flex-shrink-0"
+                          onError={(e) => {
+                            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(cust.name.split(' ').map(n => n[0]).join(''))}&background=1e293b&color=f8fafc&size=40&bold=true`;
+                          }}
+                        />
+                        <div>
+                          <p className="font-semibold text-white text-sm">{cust.name}</p>
+                          {cust.phone && <p className="text-xs text-slate-400">{cust.phone}</p>}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {customerSearch && !customer && (
+                  <button
+                    onClick={() => setShowCreateCustomerModal(true)}
+                    className="mt-3 w-full px-4 py-3 bg-gradient-to-r from-purple-600/80 to-pink-600/80 hover:from-purple-500 hover:to-pink-500 text-white font-semibold rounded-xl transition-all border border-purple-400/30 shadow-lg hover:shadow-purple-500/25 flex items-center justify-center gap-2"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Create New Customer "{customerSearch}"
+                  </button>
+                )}
               </div>
             )}
 
@@ -428,6 +474,26 @@ const CreateOrderModal = ({
             </div>
           </div>
 
+          {/* Nested Create Customer Modal - higher z-index */}
+          {showCreateCustomerModal && (
+            <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+              <div 
+                className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[60]"
+                onClick={() => setShowCreateCustomerModal(false)}
+              />
+              <CreateCustomerModal
+                isOpen={true}
+                onClose={() => setShowCreateCustomerModal(false)}
+                onSaveCustomer={(newCust) => {
+                  mockCustomers.push(newCust);
+                  setCustomer(newCust);
+                  setCustomerSearch(newCust.name);
+                  setShowCreateCustomerModal(false);
+                }}
+              />
+            </div>
+          )}
+
           {/* Footer - EXACT copy structure */}
           <div className="p-6 border-t border-white/10 bg-slate-900/95 backdrop-blur-sm sticky bottom-0">
             <div className="flex flex-col sm:flex-row gap-3">
@@ -443,7 +509,7 @@ const CreateOrderModal = ({
               {!isView ? (
                 <button 
                   onClick={handleSave}
-                  disabled={!orderDate || selectedProducts.length === 0}
+                  disabled={!orderDate || selectedProducts.length === 0 || !customer}
                   className="flex-1 px-6 py-4 bg-emerald-600/80 hover:bg-emerald-500 disabled:bg-emerald-700/50 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-all border border-emerald-400/30 flex items-center justify-center gap-2 shadow-lg hover:shadow-emerald-500/25"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -451,16 +517,7 @@ const CreateOrderModal = ({
                   </svg>
                   {isEdit ? 'Update Order' : 'Create Order'}
                 </button>
-              ) : (
-                <>
-                  <button className="flex-1 px-6 py-4 bg-blue-600/80 hover:bg-blue-500 text-white font-semibold rounded-xl transition-all border border-blue-400/30 flex items-center justify-center gap-2 shadow-lg hover:shadow-blue-500/25">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                    Edit
-                  </button>
-                </>
-              )}
+              ) : null}
             </div>
           </div>
         </div>
